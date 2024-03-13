@@ -110,7 +110,7 @@ function _G.checkPeripherals()
     end
 end
 
-function _G.setupModemConnection()
+function setupModemConnection()
     debugOutput("Setup Modem Connection on channel " .. _G.modemChannel)
     if _G.enableWireless then
         _G.wirelessModem.open(_G.modemChannel)
@@ -121,6 +121,6 @@ end
 function _G.initPeripherals()
     searchPeripherals()
     _G.checkPeripherals()
-    _G.setupModemConnection()
+    setupModemConnection()
 end
 
