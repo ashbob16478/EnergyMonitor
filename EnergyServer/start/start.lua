@@ -13,7 +13,7 @@ _G.textColor = 0
 _G.mainMenu = ""
 _G.lang = ""
 _G.program = ""
- _G.debugEnabled = 0
+_G.debugEnabled = 1
 _G.location = ""
 _G.modemChannel = 0
 _G.wirelessModemLocation = "top"
@@ -182,46 +182,48 @@ function _G.doUpdate(toVer,branch)
 	print(_G.language:getText("updateProgram"))
 	term.write("Input: ")
 
-	--Run Counter for installation skipping
-	local count = 10
-	local out = false
+--[[
+    --Run Counter for installation skipping
+    local count = 10
+    local out = false
 
-	term.setCursorPos(tx/2-5,ty)
-	term.write(" -- 10 -- ")
+    term.setCursorPos(tx/2-5,ty)
+    term.write(" -- 10 -- ")
 
-	while true do
+    while true do
 
-		local timer1 = os.startTimer(1)
+        local timer1 = os.startTimer(1)
 
-		while true do
+        while true do
 
-			local event, p1 = os.pullEvent()
+            local event, p1 = os.pullEvent()
 
-			if event == "key" then
+            if event == "key" then
 
-				if p1 == 36 or p1 == 21 then
-					shell.run("/EnergyServer/install/installer.lua update "..branch)
-					out = true
-					break
-				end
+                if p1 == 36 or p1 == 21 then
+                    shell.run("/EnergyServer/install/installer.lua update "..branch)
+                    out = true
+                    break
+                end
 
-			elseif event == "timer" and p1 == timer1 then
+            elseif event == "timer" and p1 == timer1 then
 
-				count = count - 1
-				term.setCursorPos(tx/2-5,ty)
-				term.write(" -- 0"..count.." -- ")
-				break
-			end
-		end
+                count = count - 1
+                term.setCursorPos(tx/2-5,ty)
+                term.write(" -- 0"..count.." -- ")
+                break
+            end
+        end
 
-		if out then break end
+        if out then break end
 
-		if count == 0 then
-			term.clear()
-			term.setCursorPos(1,1)
-			break
-		end
-	end
+        if count == 0 then
+            term.clear()
+            term.setCursorPos(1,1)
+            break
+        end
+    end
+--]]
 end
 
 --Download Files (For Remote version file)

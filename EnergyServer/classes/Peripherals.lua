@@ -94,8 +94,9 @@ function _G.checkPeripherals()
     -- TODO: FIX THIS CHECK LATER ON
     if amountClients < 33 then
         _G.smallMonitor = 1
-        if monX < 71 or monY < 26 then
-            local messageOut = string.gsub(string.gsub(_G.language:getText("monitorSize"), "8","7"),"6","4")
+        if monX < 29 or monY < 12 then
+            local messageOut = string.gsub(string.gsub(_G.language:getText("monitorSize"), "8","3"),"6","2")
+            messageOut = monX.."x"..monY.." "..messageOut
             controlMonitor.write(messageOut)
             error(messageOut)
         end
