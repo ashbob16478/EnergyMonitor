@@ -38,7 +38,7 @@ end
 function _G.loadOptionFile()
 	debugOutput("Loading Option File")
 	--Loads the file
-	local file = fs.open("/EnergyServer/config/options.txt","r")
+	local file = fs.open("/EnergyMonitor/config/options.txt","r")
 	local list = file.readAll()
 	file.close()
     
@@ -87,7 +87,7 @@ function _G.saveOptionFile()
     --Serialise the table
     local list = textutils.serialise(optionList)
 	--Save optionList to the config file
-	local file = fs.open("/EnergyServer/config/options.txt","w")
+	local file = fs.open("/EnergyMonitor/config/options.txt","w")
     file.writeLine(list)
 	file.close()
 	print("Saved.")
@@ -201,7 +201,7 @@ function _G.doUpdate(toVer,branch)
             if event == "key" then
 
                 if p1 == 36 or p1 == 21 then
-                    shell.run("/EnergyServer/install/installer.lua update "..branch)
+                    shell.run("/EnergyMonitor/install/installer.lua update "..branch)
                     out = true
                     break
                 end
@@ -255,7 +255,7 @@ end
 
 function initClasses()
     --Execute necessary class files
-    local binPath = "/EnergyServer/classes/"
+    local binPath = "/EnergyMonitor/classes/"
     shell.run(binPath.."base/EnergyStorage.lua")
     shell.run(binPath.."mekanism/MekanismEnergyStorage.lua")
     shell.run(binPath.."Peripherals.lua")
@@ -287,17 +287,17 @@ _G.initPeripherals()
 
 --Run program or main menu, based on the settings
 if mainMenu then
-	shell.run("/EnergyServer/start/menu.lua")
-	shell.completeProgram("/EnergyServer/start/start.lua")
+	shell.run("/EnergyMonitor/start/menu.lua")
+	shell.completeProgram("/EnergyMonitor/start/start.lua")
 else
 	if program == "server" then
-		shell.run("/EnergyServer/program/server.lua")
+		shell.run("/EnergyMonitor/program/server.lua")
 	elseif program == "client" then
-		shell.run("/EnergyServer/program/client.lua")
+		shell.run("/EnergyMonitor/program/client.lua")
 	elseif program == "monitor" then
-		shell.run("/EnergyServer/program/monitor.lua")
+		shell.run("/EnergyMonitor/program/monitor.lua")
 	end
-	shell.completeProgram("/EnergyServer/start/start.lua")
+	shell.completeProgram("/EnergyMonitor/start/start.lua")
 end
 
 --========== END OF THE START.LUA FILE ==========

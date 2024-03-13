@@ -4,11 +4,11 @@
 -- Options menu --
 
 --Loads the touchpoint and input APIs
-shell.run("cp /EnergyServer/config/touchpoint.lua /touchpoint")
+shell.run("cp /EnergyMonitor/config/touchpoint.lua /touchpoint")
 os.loadAPI("touchpoint")
 shell.run("rm touchpoint")
 
-shell.run("cp /EnergyServer/config/input.lua /input")
+shell.run("cp /EnergyMonitor/config/input.lua /input")
 os.loadAPI("input")
 shell.run("rm input")
 
@@ -28,8 +28,8 @@ local currFunct = backToMainMenu
 --Save the changes and reopen the options menu
 function saveConfigFile()
   _G.saveOptionFile()
-  shell.run("/EnergyServer/program/editOptions.lua")
-  shell.completeProgram("/EnergyServer/program/editOptions.lua")
+  shell.run("/EnergyMonitor/program/editOptions.lua")
+  shell.completeProgram("/EnergyMonitor/program/editOptions.lua")
 end
 
 --Go back to the main menu
@@ -37,7 +37,7 @@ function displayMenu()
   loadOptionFile()
   controlMonitor.clear()
   shell.run("reboot")
-  shell.completeProgram("/EnergyServer/program/editOptions.lua")
+  shell.completeProgram("/EnergyMonitor/program/editOptions.lua")
 end
 
 --Creates all buttons

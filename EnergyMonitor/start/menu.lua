@@ -3,7 +3,7 @@
 -- Version 2.6 --
 
 -- Loads the Touchpoint API (by Lyqyd)
-shell.run("cp /EnergyServer/config/touchpoint.lua /touchpoint")
+shell.run("cp /EnergyMonitor/config/touchpoint.lua /touchpoint")
 os.loadAPI("touchpoint")
 shell.run("rm touchpoint")
 
@@ -54,7 +54,7 @@ function _G.exit()
   controlMonitor.write(_G.language:getText("terminatedProgram"))    
   term.clear()
   term.setCursorPos(1,1)
-  shell.completeProgram("/EnergyServer/start/menu.lua")
+  shell.completeProgram("/EnergyMonitor/start/menu.lua")
 end
 
 function _G.switchProgram(currBut)
@@ -87,14 +87,14 @@ end
 
 function _G.startTC()
   if program == "turbine" then
-    shell.run("/EnergyServer/program/turbineControl.lua")
+    shell.run("/EnergyMonitor/program/turbineControl.lua")
   elseif program == "reactor" then
-    shell.run("/EnergyServer/program/reactorControl.lua")
+    shell.run("/EnergyMonitor/program/reactorControl.lua")
   end
 end
 
 function displayOptions()
-  shell.run("/EnergyServer/program/editOptions.lua")
+  shell.run("/EnergyMonitor/program/editOptions.lua")
 end
 
 function reboot()

@@ -2,7 +2,7 @@
 -- Original work by Thor_s_Crafter on https://github.com/ThorsCrafter/Reactor-and-Turbine-control-program -- 
 -- Touchpoint API by Lyqyd - Slightly changed --
 
-local file = fs.open("/EnergyServer/config/options.txt","r")
+local file = fs.open("/EnergyMonitor/config/options.txt","r")
 local list = file.readAll()
 file.close()
 

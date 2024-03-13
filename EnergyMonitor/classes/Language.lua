@@ -33,7 +33,7 @@ local Language = {
     end,
 
     loadLanguageById = function(self, languageId)
-        local fileName = "/EnergyServer/lang/"..languageId..".txt"
+        local fileName = "/EnergyMonitor/lang/"..languageId..".txt"
         self:loadLanguageByFile(fileName)
     end
 }
