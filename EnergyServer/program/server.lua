@@ -1,0 +1,2 @@
+print("THIS IS THE SERVER PROGRAM!")
+os.sleep(10000)
