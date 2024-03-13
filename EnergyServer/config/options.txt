@@ -6,7 +6,7 @@
   program = "turbine",
   controlMonitor = "",
   language = "en",
-  debug = 0,
+  debug = 1,
   location = "mainReactor",
   modemChannel = 5
 }
