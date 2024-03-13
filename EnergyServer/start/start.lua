@@ -46,7 +46,7 @@ end
 function _G.loadOptionFile()
 	debugOutput("Loading Option File")
 	--Loads the file
-	local file = fs.open("/extreme-reactors-control/config/options.txt","r")
+	local file = fs.open("/EnergyServer/config/options.txt","r")
 	local list = file.readAll()
 	file.close()
 
@@ -119,7 +119,7 @@ function _G.saveOptionFile()
     --Serialise the table
     local list = textutils.serialise(optionList)
 	--Save optionList to the config file
-	local file = fs.open("/extreme-reactors-control/config/options.txt","w")
+	local file = fs.open("/EnergyServer/config/options.txt","w")
     file.writeLine(list)
 	file.close()
 	print("Saved.")
@@ -232,7 +232,7 @@ function _G.doUpdate(toVer,branch)
 			if event == "key" then
 
 				if p1 == 36 or p1 == 21 then
-					shell.run("/extreme-reactors-control/install/installer.lua update "..branch)
+					shell.run("/EnergyServer/install/installer.lua update "..branch)
 					out = true
 					break
 				end
@@ -285,7 +285,7 @@ end
 
 function initClasses()
     --Execute necessary class files
-    local binPath = "/extreme-reactors-control/classes/"
+    local binPath = "/EnergyServer/classes/"
     shell.run(binPath.."base/Reactor.lua")
     shell.run(binPath.."base/Turbine.lua")
     shell.run(binPath.."base/EnergyStorage.lua")
@@ -323,19 +323,19 @@ checkUpdates()
 --Run program or main menu, based on the settings
 if  amountReactors < 0 then
 	--this is a monitor only we do show anything with the menu
-	shell.run("/extreme-reactors-control/program/monitor.lua")
+	shell.run("/EnergyServer/program/monitor.lua")
 elseif mainMenu then
-	shell.run("/extreme-reactors-control/start/menu.lua")
-	shell.completeProgram("/extreme-reactors-control/start/start.lua")
+	shell.run("/EnergyServer/start/menu.lua")
+	shell.completeProgram("/EnergyServer/start/start.lua")
 else
 	if program == "turbine" then
-		shell.run("/extreme-reactors-control/program/turbineControl.lua")
+		shell.run("/EnergyServer/program/turbineControl.lua")
 	elseif program == "reactor" then
-		shell.run("/extreme-reactors-control/program/reactorControl.lua")
+		shell.run("/EnergyServer/program/reactorControl.lua")
 	elseif program == "monitor" then
-		shell.run("/extreme-reactors-control/program/monitor.lua")
+		shell.run("/EnergyServer/program/monitor.lua")
 	end
-	shell.completeProgram("/extreme-reactors-control/start/start.lua")
+	shell.completeProgram("/EnergyServer/start/start.lua")
 end
 
 

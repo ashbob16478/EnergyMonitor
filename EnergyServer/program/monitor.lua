@@ -3,7 +3,7 @@
 -- Version 1.0 --
 -- Remote Monitor --
 
-shell.run("cp /extreme-reactors-control/config/input.lua /input")
+shell.run("cp /EnergyServer/config/input.lua /input")
 os.loadAPI("input")
 shell.run("rm input")
 
