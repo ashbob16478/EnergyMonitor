@@ -8,20 +8,12 @@
 --All options
 _G.optionList = {}
 _G.version = 0
-_G.rodLevel = 0
 _G.backgroundColor = 0
 _G.textColor = 0
-_G.reactorOffAt = 0
-_G.reactorOnAt = 0
 _G.mainMenu = ""
 _G.lang = ""
-_G.overallMode = ""
 _G.program = ""
-_G.turbineTargetSpeed = 0
-_G.targetSteam = 0
-_G.turbineOnOff = ""
  _G.debugEnabled = 0
-_G.skipControlRodCheck = 0
 _G.location = ""
 _G.modemChannel = 0
 _G.wirelessModemLocation = "top"
@@ -55,19 +47,11 @@ function _G.loadOptionFile()
 
 	--Assign values to variables
 	_G.version = optionList["version"]
-	_G.rodLevel = optionList["rodLevel"]
 	_G.backgroundColor = tonumber(optionList["backgroundColor"])
 	_G.textColor = tonumber(optionList["textColor"])
-	_G.reactorOffAt = optionList["reactorOffAt"]
-	_G.reactorOnAt = optionList["reactorOnAt"]
 	_G.mainMenu = optionList["mainMenu"]
-	_G.overallMode = optionList["overallMode"]
 	_G.program = optionList["program"]
-	_G.turbineTargetSpeed = optionList["turbineTargetSpeed"]
-	_G.targetSteam  = optionList["targetSteam"]
-	_G.turbineOnOff = optionList["turbineOnOff"]
 	_G.debugEnabled = optionList["debug"]
-	_G.skipControlRodCheck = optionList["skipControlRodCheck"]
 	_G.lang = optionList["language"]
 	_G.location = optionList["location"]
 	_G.modemChannel = optionList["modemChannel"]
@@ -78,30 +62,14 @@ function _G.refreshOptionList()
 	debugOutput("Refreshing Option List")
 	debugOutput("Variable: version")
 	optionList["version"] = version
-	debugOutput("Variable: rodLevel")
-	optionList["rodLevel"] = rodLevel
 	debugOutput("Variable: backgroundColor"..backgroundColor)
 	optionList["backgroundColor"] = backgroundColor
 	debugOutput("Variable: textColor = "..textColor)
 	optionList["textColor"] = textColor
-	debugOutput("Variable: reactorOffAt")
-	optionList["reactorOffAt"] = reactorOffAt
-	debugOutput("Variable: reactorOnAt")
-	optionList["reactorOnAt"] = reactorOnAt
 	debugOutput("Variable: mainMenu")
 	optionList["mainMenu"] = mainMenu
-	debugOutput("Variable: overallMode")
-	optionList["overallMode"] = overallMode
 	debugOutput("Variable: program")
 	optionList["program"] = program
-	debugOutput("Variable: turbineTargetSpeed")
-	optionList["turbineTargetSpeed"] = turbineTargetSpeed
-	debugOutput("Variable: targetSteam")
-	optionList["targetSteam"] = targetSteam
-	debugOutput("Variable: turbineOnOff")
-	optionList["turbineOnOff"] = turbineOnOff
-	debugOutput("Variable: skipControlRodCheck")
-	optionList["skipControlRodCheck"] = skipControlRodCheck
 	debugOutput("Variable: lang")
 	optionList["language"] = lang
 	debugOutput("Variable: location")
@@ -286,17 +254,10 @@ end
 function initClasses()
     --Execute necessary class files
     local binPath = "/EnergyServer/classes/"
-    shell.run(binPath.."base/Reactor.lua")
-    shell.run(binPath.."base/Turbine.lua")
     shell.run(binPath.."base/EnergyStorage.lua")
-    shell.run(binPath.."bigger_reactors/Reactor.lua")
-    shell.run(binPath.."bigger_reactors/Turbine.lua")
     shell.run(binPath.."mekanism/MekanismEnergyStorage.lua")
-    shell.run(binPath.."thermal_expansion/ThermalExpansionEnergyStorage.lua")
     shell.run(binPath.."Peripherals.lua")
     shell.run(binPath.."Language.lua")
-	shell.run(binPath.."transport/reactoronly.lua")
-	shell.run(binPath.."transport/reactorTurbine.lua")
 	shell.run(binPath.."transport/startup.lua")
     shell.run(binPath.."transport/wrapper.lua")
 end
@@ -318,20 +279,19 @@ debugOutput("Initializing Network Devices")
 _G.initPeripherals()
 
 debugOutput("Checking for Updates")
-checkUpdates()
+
+-- check for updates in gitlab/github branch (NOT NEEDED)
+--checkUpdates()
 
 --Run program or main menu, based on the settings
-if  amountReactors < 0 then
-	--this is a monitor only we do show anything with the menu
-	shell.run("/EnergyServer/program/monitor.lua")
-elseif mainMenu then
+if mainMenu then
 	shell.run("/EnergyServer/start/menu.lua")
 	shell.completeProgram("/EnergyServer/start/start.lua")
 else
-	if program == "turbine" then
-		shell.run("/EnergyServer/program/turbineControl.lua")
-	elseif program == "reactor" then
-		shell.run("/EnergyServer/program/reactorControl.lua")
+	if program == "server" then
+		shell.run("/EnergyServer/program/server.lua")
+	elseif program == "client" then
+		shell.run("/EnergyServer/program/client.lua")
 	elseif program == "monitor" then
 		shell.run("/EnergyServer/program/monitor.lua")
 	end
