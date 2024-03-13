@@ -41,7 +41,7 @@ function _G.loadOptionFile()
 	local file = fs.open("/EnergyServer/config/options.txt","r")
 	local list = file.readAll()
 	file.close()
-
+    
     --Insert Elements and assign values
     _G.optionList = textutils.unserialise(list)
 
@@ -264,6 +264,7 @@ function initClasses()
     shell.run(binPath.."transport/wrapper.lua")
 end
 
+
 --=========== Run the program ==========
 
 --Load the option file and initialize the peripherals
@@ -280,9 +281,8 @@ _G.language = _G.newLanguageById(_G.lang)
 debugOutput("Initializing Network Devices")
 _G.initPeripherals()
 
-debugOutput("Checking for Updates")
-
 -- check for updates in gitlab/github branch (NOT NEEDED)
+--debugOutput("Checking for Updates")
 --checkUpdates()
 
 --Run program or main menu, based on the settings
@@ -299,6 +299,5 @@ else
 	end
 	shell.completeProgram("/EnergyServer/start/start.lua")
 end
-
 
 --========== END OF THE START.LUA FILE ==========
