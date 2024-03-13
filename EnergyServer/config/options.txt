@@ -1,9 +1,9 @@
 {
-  mainMenu = true,
+  mainMenu = false,
   backgroundColor = 128,
   version = "1.0-alpha",
   textColor = 1,
-  program = "turbine",
+  program = "server",
   controlMonitor = "",
   language = "en",
   debug = 1,
