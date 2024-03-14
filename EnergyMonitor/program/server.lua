@@ -21,6 +21,15 @@ local energyMetersCount = 0
 local debugPrint = false
 
 
+local pages = {}
+local currentPageId = 1
+local totalPageCount = 1
+local currentPage = {}
+
+currentPage = touchpoint.new(_G.touchpointLocation)
+pages[currentPageId] = currentPage
+
+
 local function totalEnergy()
     local total = 0
     for k, v in pairs(capacitors) do
@@ -39,6 +48,14 @@ end
 
 local function energyPercentage()
     return totalEnergy() / totalMaxEnergy() * 100
+end
+
+local function totalOutputRate()
+    local total = 0
+    for k, v in pairs(energyMeters) do
+        total = total + v.data.transfer
+    end
+    return total
 end
 
 local function addClient(client) 
@@ -178,43 +195,53 @@ local function toggle(page, button)
     rs.setOutput("front", not rs.getOutput("front"))
 end
 
-
-
-
-    local pages = {}
-    local currentPageId = 1
-    local totalPageCount = 1
-    local currentPage = {}
-    
-    currentPage = touchpoint.new(_G.touchpointLocation)
-    pages[currentPageId] = currentPage
-
-
 local function setupMonitor() 
     _G.controlMonitor.setTextScale(0.5)
 
     local monWidth,monHeight = _G.controlMonitor.getSize()
     monWidth = monWidth
     monHeight = monHeight - 1
+    local btnOffsetBorder = 2
 
 
 
 
-    ------------------------------
-    -- Capacitor Energy Display --
-    ------------------------------
+    ------------------------------------
+    -- Total Capacitor Energy Display --
+    ------------------------------------
 
     local capWidth = 30
     local capHeight = 2
 
-    local capMinX = 2
-    local capMinY = 2
+    local capMinX = btnOffsetBorder
+    local capMinY = btnOffsetBorder
     local capMaxX = capWidth + capMinX
     local capMaxY = capHeight + capMinY
-
+    local lh = 3
     
-    currentPage:add("Energy", function() end, capMinX, capMinY, capMaxX, capMaxY, colors.red, colors.lime)
+    currentPage:add("Energy Stored:", function() end, capMinX, capMinY, capMaxX, capMaxY, colors.red, colors.lime)
+    currentPage:add("Energy", function() end, capMinX, capMinY + lh, capMaxX, capMaxY + lh, colors.red, colors.lime)
     currentPage:setLabel("Energy", "-1")
+    print(totalPageCount)
+
+
+
+    ----------------------------------------
+    -- Total Energymeter Transfer Display --
+    ----------------------------------------
+
+    local capWidth = 30
+    local capHeight = 2
+
+    local capMinX = monWidth - btnOffsetBorder - capWidth
+    local capMinY = btnOffsetBorder
+    local capMaxX = monWidth - btnOffsetBorder
+    local capMaxY = capHeight + capMinY
+    local lh = 3
+    
+    currentPage:add("Total Output Rate:", function() end, capMinX, capMinY, capMaxX, capMaxY, colors.red, colors.lime)
+    currentPage:add("OutputRate", function() end, capMinX, capMinY + lh, capMaxX, capMaxY + lh, colors.red, colors.lime)
+    currentPage:setLabel("OutputRate", "-1")
     print(totalPageCount)
 
 
@@ -226,7 +253,6 @@ local function setupMonitor()
 
     local btnWidth = 5
     local btnHeight = 0
-    local btnOffsetBorder = 2
 
     pMinX = btnOffsetBorder
     pMinY = monHeight - btnHeight
@@ -261,6 +287,7 @@ local function updateMonitorValues()
     while true do
 
         currentPage:setLabel("Energy", _G.numberToEnergyUnit(totalEnergy()) .. "/" .. _G.numberToEnergyUnit(totalMaxEnergy()) .. " (" .. _G.formatDecimals(energyPercentage(), 1) .. "%)")
+        currentPage:setLabel("OutputRate", _G.numberToEnergyUnit(totalOutputRate()) .. "/t")
 
         os.sleep(0.1)
     end
