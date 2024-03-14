@@ -10,9 +10,11 @@ local connectedClients = {}
 local capacitors = {}
 local energyMeters = {}
 local connectedClientsCount = 0
+local capacitorsCount = 0
+local energyMetersCount = 0
 
 
-function addClient(client) 
+local function addClient(client) 
     -- add client to connectedClients
     if connectedClients[client.id] ~= nil then
         -- update client
@@ -21,22 +23,40 @@ function addClient(client)
         -- add client
         connectedClients[client.id] = client
         connectedClientsCount = connectedClientsCount + 1
+
+        -- add clientid to respective list
+        if client.type == _G.MessageDataPeripheral.EnergyMeter then
+            energyMeters[client.id] = client
+            energyMetersCount = energyMetersCount + 1
+        elseif client.type == _G.MessageDataPeripheral.Capacitor then
+            capacitors[client.id] = client
+            capacitorsCount = capacitorsCount + 1
+        end
     end
 end
 
-function dropNotRespondingClients()
+local function dropNotRespondingClients()
     -- remove client from connectedClients if lastPing is older than timeout
     for k, v in pairs(connectedClients) do
         if os.clock() - v.lastPing > timeout then
             connectedClients[k] = nil
             connectedClientsCount = connectedClientsCount - 1
+
+            -- remove clientid from respective list
+            if v.type == _G.MessageDataPeripheral.EnergyMeter then
+                energyMeters[k] = nil
+                energyMetersCount = energyMetersCount - 1
+            elseif v.type == _G.MessageDataPeripheral.Capacitor then
+                capacitors[k] = nil
+                capacitorsCount = capacitorsCount - 1
+            end
         end
     end
 end
 
 print("THIS IS THE SERVER PROGRAM!")
 
-function ping_clients()
+local function ping_clients()
     while true do
         term.clear()
         term.setCursorPos(1,1)
@@ -57,7 +77,7 @@ function ping_clients()
     end
 end
 
-function listen()
+local function listen()
     -- Receive data from all connected clients
     while true do
         local clock = os.clock()
