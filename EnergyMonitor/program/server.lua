@@ -122,6 +122,7 @@ local function listen()
             print("Connected clients: "..connectedClientsCount)
             print("Energy Meters: "..energyMetersCount)
             print("Capacitors: "..capacitorsCount)
+
             -- Write to terminal
             term.redirect(term.native())
         end
