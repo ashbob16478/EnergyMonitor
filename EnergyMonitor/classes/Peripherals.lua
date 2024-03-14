@@ -10,12 +10,13 @@ _G.controlMonitor = "" --Monitor
 _G.capacitors = {} --Energy Storage
 _G.wirelessModem = "" --wirelessModem
 _G.enableWireless = false
+_G.energyMeter = "" --Energy Meter
 
 --Total count of all attachments
 _G.amountMonitors = 0
 _G.amountCapacitors = 0
 _G.smallMonitor = 1
-_G.amountClients = 0
+
 
 local function searchPeripherals()
     local peripheralList = peripheral.getNames()
@@ -41,6 +42,9 @@ local function searchPeripherals()
                 _G.wirelessModem = peri
                 _G.enableWireless = true
             end
+        elseif periType == "energymeter" then
+            print("Energy Meter - "..periItem)
+            _G.energyMeter = newEnergyMeter("em0", peri, periItem, periType)
         else
             local successGetEnergyStored, errGetEnergyStored = pcall(function() peri.getEnergyStored() end)
             local isMekanism = periType == "inductionMatrix" 
