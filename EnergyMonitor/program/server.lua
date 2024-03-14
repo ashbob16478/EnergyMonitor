@@ -2,7 +2,7 @@ _G.connectedClients = {}
 
 print("THIS IS THE SERVER PROGRAM!")
 
-function main_loop()
+function ping_clients()
     while true do
         term.clear()
         term.setCursorPos(1,1)
@@ -45,4 +45,4 @@ function listen()
 end
 
 -- Run the pinger and the listener in parallel
-parallel.waitForAll(listen, main_loop)
+parallel.waitForAll(listen, ping_clients)
