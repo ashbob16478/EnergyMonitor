@@ -13,6 +13,7 @@ _G.textColor = 0
 _G.mainMenu = ""
 _G.lang = ""
 _G.program = ""
+_G.meterType = 0
 _G.debugEnabled = 1
 _G.location = ""
 _G.modemChannel = 0
@@ -51,6 +52,7 @@ function _G.loadOptionFile()
 	_G.textColor = tonumber(optionList["textColor"])
 	_G.mainMenu = optionList["mainMenu"]
 	_G.program = optionList["program"]
+	_G.meterType = optionList["meterType"]
 	_G.debugEnabled = optionList["debug"]
 	_G.lang = optionList["language"]
 	_G.location = optionList["location"]
@@ -70,6 +72,8 @@ function _G.refreshOptionList()
 	optionList["mainMenu"] = mainMenu
 	debugOutput("Variable: program")
 	optionList["program"] = program
+	debugOutput("Variable: meterType")
+	optionList["meterType"] = meterType
 	debugOutput("Variable: lang")
 	optionList["language"] = lang
 	debugOutput("Variable: location")

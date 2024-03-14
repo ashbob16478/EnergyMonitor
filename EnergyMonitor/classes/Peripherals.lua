@@ -87,6 +87,7 @@ function _G.checkPeripherals()
     controlMonitor.setTextColor(colors.red)
     controlMonitor.clear()
     controlMonitor.setCursorPos(1,1)
+    controlMonitor.setTextScale(0.5)
     
     --Monitor too small
     local monX,monY = controlMonitor.getSize()

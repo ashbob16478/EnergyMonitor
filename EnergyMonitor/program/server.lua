@@ -53,7 +53,19 @@ end
 local function totalOutputRate()
     local total = 0
     for k, v in pairs(energyMeters) do
-        total = total + v.data.transfer
+        if v.data.meterType == _G.MeterType.using then
+            total = total + v.data.transfer
+        end
+    end
+    return total
+end
+
+local function totalInputRate()
+    local total = 0
+    for k, v in pairs(energyMeters) do
+        if v.data.meterType == _G.MeterType.providing then
+            total = total + v.data.transfer
+        end
     end
     return total
 end
@@ -196,8 +208,6 @@ local function toggle(page, button)
 end
 
 local function setupMonitor() 
-    _G.controlMonitor.setTextScale(0.5)
-
     local monWidth,monHeight = _G.controlMonitor.getSize()
     monWidth = monWidth
     monHeight = monHeight - 1
@@ -221,7 +231,6 @@ local function setupMonitor()
     
     currentPage:add("Energy Stored:", function() end, capMinX, capMinY, capMaxX, capMaxY, colors.red, colors.lime)
     currentPage:add("Energy", function() end, capMinX, capMinY + lh, capMaxX, capMaxY + lh, colors.red, colors.lime)
-    currentPage:setLabel("Energy", "-1")
     print(totalPageCount)
 
 
@@ -239,9 +248,8 @@ local function setupMonitor()
     local capMaxY = capHeight + capMinY
     local lh = 3
     
-    currentPage:add("Total Output Rate:", function() end, capMinX, capMinY, capMaxX, capMaxY, colors.red, colors.lime)
-    currentPage:add("OutputRate", function() end, capMinX, capMinY + lh, capMaxX, capMaxY + lh, colors.red, colors.lime)
-    currentPage:setLabel("OutputRate", "-1")
+    currentPage:add("OutputRate", function() end, capMinX, capMinY, capMaxX, capMaxY, colors.red, colors.lime)
+    currentPage:add("InputRate", function() end, capMinX, capMinY + lh, capMaxX, capMaxY + lh, colors.red, colors.lime)
     print(totalPageCount)
 
 
@@ -287,8 +295,8 @@ local function updateMonitorValues()
     while true do
 
         currentPage:setLabel("Energy", _G.numberToEnergyUnit(totalEnergy()) .. "/" .. _G.numberToEnergyUnit(totalMaxEnergy()) .. " (" .. _G.formatDecimals(energyPercentage(), 1) .. "%)")
-        currentPage:setLabel("OutputRate", _G.numberToEnergyUnit(totalOutputRate()) .. "/t")
-
+        currentPage:setLabel("OutputRate", "Out: ".. _G.numberToEnergyUnit(totalOutputRate()) .. "/t")
+        currentPage:setLabel("InputRate", "In: ".. _G.numberToEnergyUnit(totalInputRate()) .. "/t")
         os.sleep(0.1)
     end
 end

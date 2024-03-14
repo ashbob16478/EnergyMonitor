@@ -4,6 +4,7 @@
   version = "1.0-alpha",
   textColor = 1,
   program = "server",
+  meterType = 1,
   controlMonitor = "",
   language = "en",
   debug = 1,

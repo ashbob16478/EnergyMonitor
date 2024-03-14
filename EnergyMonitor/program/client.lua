@@ -33,7 +33,7 @@ while true do
         peripheralData.transfer = _G.energyMeter:transferRate()
         peripheralData.mode = _G.energyMeter:mode()
         peripheralData.status = _G.energyMeter:status()
-
+        peripheralData.meterType = _G.meterType
         _G.printEnergyMeterData(_G.energyMeter)
     elseif _G.capacitor ~= nil then
         data.peripheral = _G.MessageDataPeripheral.Capacitor

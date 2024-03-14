@@ -9,12 +9,18 @@ _G.MessageType = {
     Client = 1,
  }
 
+_G.MeterType = {
+    providing = 0,
+    using = 1
+}
+
 _G.MeterData = {
     name = "",
     id = "",
     transfer = -1,
     mode = "",
     status = "",
+    meterType = ""
 }
 
 _G.CapacitorData = {
