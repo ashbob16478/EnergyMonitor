@@ -5,11 +5,7 @@ while true do
     term.clear()
     term.setCursorPos(1,1)
 
-    _G.printEnergyMeterData(_G.energyMeter)
-
-
-
-
+    
     -- Receive ping from server
     local msg = _G.receiveMessage()
     print(os.clock())
@@ -22,6 +18,8 @@ while true do
 
 
     -- send updated Data to server
+    _G.printEnergyMeterData(_G.energyMeter)
+    
     local data = {}
     setmetatable(data,{__index = MeterData})
     data.name = os.getComputerLabel()
