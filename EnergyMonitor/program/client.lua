@@ -1,22 +1,37 @@
 print("THIS IS THE CLIENT PROGRAM!")
 
 while true do
-    os.sleep(1)
+    --os.sleep(1)
     term.clear()
     term.setCursorPos(1,1)
 
-    -- Send test message to all connected clients
     _G.printEnergyMeterData(_G.energyMeter)
 
-    -- Receive messages from all connected clients
-    
+
+
+
+    -- Receive ping from server
     local msg = _G.receiveMessage()
-    print()
+    print(os.clock())
     print("I just received a message of type: ".. _G.parseType(msg.type))
     print("The message was sent from: ".. _G.parseSender(msg.sender))
     print("The message was: "..msg.data)
     print()
 
+
+
+
+    -- send updated Data to server
+    local data = {}
+    setmetatable(data,{__index = MeterData})
+    data.name = os.getComputerLabel()
+    data.id = tostring(_G.energyMeter.id)
+    data.transfer = _G.energyMeter:transferRate()
+    data.mode = _G.energyMeter:mode()
+    data.status = _G.energyMeter:status()
+
+    local msg = _G.NewUpdateToServer(data)
+    _G.sendMessage(msg)
 
 --[[
 

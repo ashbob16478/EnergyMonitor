@@ -11,6 +11,7 @@ _G.MessageType = {
 
 _G.MeterData = {
     name = "",
+    id = "",
     transfer = -1,
     mode = "",
     status = "",
