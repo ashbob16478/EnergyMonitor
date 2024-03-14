@@ -16,7 +16,7 @@ _G.energyMeter = "" --Energy Meter
 _G.amountMonitors = 0
 _G.amountCapacitors = 0
 _G.smallMonitor = 1
-
+_G.amountClients = 0
 
 local function searchPeripherals()
     local peripheralList = peripheral.getNames()
@@ -96,7 +96,7 @@ function _G.checkPeripherals()
     local monX,monY = controlMonitor.getSize()
     
     -- TODO: FIX THIS CHECK LATER ON
-    if amountClients < 33 then
+    if _G.amountClients < 33 then
         _G.smallMonitor = 1
         if monX < 29 or monY < 12 then
             local messageOut = string.gsub(string.gsub(_G.language:getText("monitorSize"), "8","3"),"6","2")

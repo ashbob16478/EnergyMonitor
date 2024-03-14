@@ -9,9 +9,11 @@ _G.MessageType = {
     Client = 1,
  }
 
-_G.Data = {
+_G.MeterData = {
     name = "",
     transfer = -1,
+    mode = "",
+    status = "",
 }
 
 _G.Message = {

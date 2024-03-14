@@ -4,28 +4,42 @@ local EnergyMeter = {
     side = "",
     type = "",
     
-    transferRate = function(self)
-        return self.id.getTransferRate()
+    sideConfig = function(self)
+        return self.id.getSideConfig()
     end,
-    transferRateLimit = function(self)
-        return self.id.getTransferRateLimit()
+    interval = function(self)
+        return self.id.getInterval()
     end,
-    setTransferLimit = function (self, limit)
-        self.id.setTransferRateLimit(limit)
+    accuracy = function(self)
+        return self.id.getAccuracy()
     end,
-    totalTransferred = function(self)
-        return self.id.getTotalEnergyTransferred()
+    hasOutput = function(self)
+        return self.id.hasOutput()
+    end,
+    threshold = function(self)
+        return self.id.getThreshold()
+    end,
+    mode = function(self)
+        return self.id.getMode()
+    end,
+    fullSideConfig = function(self)
+        return self.id.getFullSideConfig()
+    end,
+    hasMaxOutputs = function(self)
+        return self.id.hasMaxOutputs()
     end,
     status = function(self)
         return self.id.getStatus()
     end,
-    redstoneControlState = function(self)
-        return self.id.getRedstoneControlState()
+    hasInput = function(self)
+        return self.id.hasInput()
     end,
-    energyType = function(self)
-        return self.id.getEnergyType()
+    numberMode = function(self)
+        return self.id.getNumberMode()
     end,
-
+    transferRate = function(self)
+        return self.id.getTransferRate()
+    end
 }
 
 function _G.newEnergyMeter(name,id, side, type)
@@ -48,10 +62,10 @@ end
 function _G.printEnergyMeterData(meter)
     print("Name: "..meter.name)
     print("ID: "..tostring(meter.id))
-    print("transferRate: "..meter:transferRate())
-    print("transferRateLimit: "..meter:transferRateLimit())
-    print("totalTransferred: "..meter:totalTransferred())
-    print("status: "..meter:status())
-    print("redstoneControlState: "..meter:redstoneControlState())
-    print("energyType: "..meter:energyType())
+    print("hasOutput: "..tostring(meter:hasOutput()))
+    print("mode: "..tostring(meter:mode()))
+    print("status: "..tostring(meter:status()))
+    print("hasInput: "..tostring(meter:hasInput()))
+    print("transferRate: "..tostring(meter:transferRate()))
+    
 end

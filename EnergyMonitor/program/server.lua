@@ -1,4 +1,3 @@
-_G.amountClients = 0
 _G.connectedClients = {}
 
 print("THIS IS THE SERVER PROGRAM!")

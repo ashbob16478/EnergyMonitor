@@ -257,6 +257,7 @@ function initClasses()
     --Execute necessary class files
     local binPath = "/EnergyMonitor/classes/"
     shell.run(binPath.."base/EnergyStorage.lua")
+	shell.run(binPath.."base/EnergyMeter.lua")
     shell.run(binPath.."mekanism/MekanismEnergyStorage.lua")
     shell.run(binPath.."Peripherals.lua")
     shell.run(binPath.."Language.lua")

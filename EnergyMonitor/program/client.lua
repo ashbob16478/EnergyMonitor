@@ -2,18 +2,24 @@ print("THIS IS THE CLIENT PROGRAM!")
 
 while true do
     os.sleep(1)
+    term.clear()
+    term.setCursorPos(1,1)
 
     -- Send test message to all connected clients
-    
+    _G.printEnergyMeterData(_G.energyMeter)
 
     -- Receive messages from all connected clients
+    
     local msg = _G.receiveMessage()
+    print()
     print("I just received a message of type: ".. _G.parseType(msg.type))
     print("The message was sent from: ".. _G.parseSender(msg.sender))
     print("The message was: "..msg.data)
     print()
 
-    --[[
+
+--[[
+
     local msg = _G.receiveMessage()
 
     print("I just received a message of type: ".. _G.parseType(msg.type))
@@ -27,7 +33,7 @@ while true do
     print("The sender is: "..(senderDistance or "an unknown number of").." blocks away from me.")
     --]]
 
-    
+
     -- Process messages from clients
     
 end
