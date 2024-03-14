@@ -17,31 +17,49 @@ _G.MeterData = {
     status = "",
 }
 
+_G.CapacitorData = {
+    name = "",
+    id = "",
+    energy = -1,
+    maxEnergy = -1,
+    status = "",
+}
+
+_G.MessageDataPeripheral = {
+    Capacitor = 0,
+    EnergyMeter = 1,
+}
+
+_G.MessageData = {
+    peripheral = {},
+    data = {}
+}
+
 _G.Message = {
     type = "",
     sender = "",
-    data = {}
+    messageData = {}
 }
 
 
 
 
-function _G.NewHandshakeToServer(data)
+function _G.NewHandshakeToServer(messageData)
     local message = {}
     setmetatable(message,{__index = Message})
 
-    message.data = data
+    message.messageData = messageData
     message.type = MessageType.Handshake
     message.sender = Sender.Client
 
     return message
 end
 
-function _G.NewHandshakeFromServer(data)
+function _G.NewHandshakeFromServer(messageData)
     local message = {}
     setmetatable(message,{__index = Message})
 
-    message.data = data
+    message.messageData = messageData
     message.type = MessageType.Handshake
     message.sender = Sender.Server
 
@@ -51,22 +69,22 @@ end
 
 
 
-function _G.NewUpdateToServer(data)
+function _G.NewUpdateToServer(messageData)
     local message = {}
     setmetatable(message,{__index = Message})
 
-    message.data = data
+    message.messageData = messageData
     message.type = MessageType.Update
     message.sender = Sender.Client
 
     return message
 end
 
-function _G.NewUpdateFromServer(data)
+function _G.NewUpdateFromServer(messageData)
     local message = {}
     setmetatable(message,{__index = Message})
 
-    message.data = data
+    message.messageData = messageData
     message.type = MessageType.Update
     message.sender = Sender.Server
 
@@ -80,7 +98,7 @@ function _G.NewPingToServer()
     local message = {}
     setmetatable(message,{__index = Message})
 
-    message.data = "data"
+    message.messageData = "data"
     message.type = MessageType.Ping
     message.sender = Sender.Client
 
@@ -91,7 +109,7 @@ function _G.NewPingFromServer()
     local message = {}
     setmetatable(message,{__index = Message})
 
-    message.data = "data"
+    message.messageData = "data"
     message.type = MessageType.Ping
     message.sender = Sender.Server
 
@@ -123,7 +141,15 @@ function _G.parseType(type)
     end
 end
 
-
+function _G.parsePeripheralType(type)
+    if type == MessageDataPeripheral.Capacitor then
+        return "Capacitor"
+    elseif type == MessageDataPeripheral.EnergyMeter then
+        return "EnergyMeter"
+    else
+        return "Unknown"
+    end
+end
 
 
 local function serializeMessage(message)

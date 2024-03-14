@@ -7,14 +7,14 @@
 --Peripherals
 _G.monitors = {} --Monitor
 _G.controlMonitor = "" --Monitor
-_G.capacitors = {} --Energy Storage
 _G.wirelessModem = "" --wirelessModem
 _G.enableWireless = false
-_G.energyMeter = "" --Energy Meter
+
+_G.energyMeter = nil --Energy Meter
+_G.capacitor = nil --Energy Storage
 
 --Total count of all attachments
 _G.amountMonitors = 0
-_G.amountCapacitors = 0
 _G.smallMonitor = 1
 _G.amountClients = 0
 
@@ -61,20 +61,16 @@ local function searchPeripherals()
             if isBase then
                 --Capacitorbank / Energycell / Energy Core
                 print("getEnergyStored() device - "..peripheralList[i])
-                _G.capacitors[amountCapacitors] = newEnergyStorage("e" .. tostring(amountCapacitors), peri, periItem, periType)
-                _G.amountCapacitors = amountCapacitors + 1
+                _G.capacitor = newEnergyStorage("ec0", peri, periItem, periType)
             end
 
             if isMekanism then
                 --Mekanism V10plus 
                 print("Mekanism Energy Storage device - "..peripheralList[i])
-                _G.capacitors[amountCapacitors] = newMekanismEnergyStorage("e" .. tostring(amountCapacitors), peri, periItem, periType)
-                _G.amountCapacitors = amountCapacitors + 1
+                _G.capacitor = newMekanismEnergyStorage("ec0", peri, periItem, periType)
             end
         end
     end
-
-    _G.amountCapacitors = amountCapacitors - 1
 end
 
 function _G.checkPeripherals()
