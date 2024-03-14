@@ -9,6 +9,11 @@ _G.MessageType = {
     Client = 1,
  }
 
+_G.Data = {
+    name = "",
+    transfer = -1,
+}
+
 _G.Message = {
     type = "",
     sender = "",
