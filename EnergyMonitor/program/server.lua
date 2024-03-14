@@ -214,8 +214,6 @@ local function setupMonitor()
     local btnOffsetBorder = 2
 
 
-
-
     ------------------------------------
     -- Total Capacitor Energy Display --
     ------------------------------------
@@ -236,7 +234,7 @@ local function setupMonitor()
 
 
     ----------------------------------------
-    -- Total Energymeter Transfer Display --
+    -- Total EnergyMeter Transfer Display --
     ----------------------------------------
 
     local capWidth = 30
@@ -255,6 +253,18 @@ local function setupMonitor()
 
 
 
+    -------------------------------
+    -- EnergyMeter Display Cells --
+    -------------------------------
+
+    local meterCount = energyMetersCount
+    local neededPages = math.ceil(meterCount / 4)   -- 4 meters per page  (ceiled)
+    --SETUP PAGES and add them to page table. Also call setupMonitor in interval since the amount of cells might change
+    --Buttons next/prev used to inc/dec pageIndex
+
+
+
+    
     ---------------------------------------
     -- footer buttons offsets/dimensions --
     ---------------------------------------
@@ -312,9 +322,10 @@ end
 -- ACTUAL SERVER PROGRAM STARTS HERE --
 ---------------------------------------
 
-
--- Run the pinger and the listener in parallel
+-- setup monitor gui
 setupMonitor()
+
+-- Run the pinger and the listener and monitor updaters in parallel
 parallel.waitForAll(listen, ping_clients, updateMonitorValues, touchListener)
 
 
