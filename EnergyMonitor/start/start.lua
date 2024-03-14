@@ -261,7 +261,7 @@ function initClasses()
     shell.run(binPath.."Peripherals.lua")
     shell.run(binPath.."Language.lua")
 	shell.run(binPath.."transport/startup.lua")
-    shell.run(binPath.."transport/wrapper.lua")
+    shell.run(binPath.."transport/Message.lua")
 end
 
 

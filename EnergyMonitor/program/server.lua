@@ -5,9 +5,13 @@ while true do
     
     -- Send test message to all connected clients
     print("Sending a message to all clients on channel: ".._G.modemChannel)
-    _G.wirelessModem.transmit(_G.modemChannel, _G.modemChannel, "Hello, clients!")
+
+    local msg = _G.NewPingFromServer()
+    _G.sendMessage(msg)
+
 
     -- Receive messages from all connected clients
+
 
     -- Process messages from clients
 
