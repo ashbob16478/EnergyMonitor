@@ -97,7 +97,7 @@ local function listen()
             client.id = data.id
             client.name = data.name
             client.data = data
-            client.type = _G.parsePeripheralType(msg.messageData.peripheral)
+            client.type = msg.messageData.peripheral
             client.lastPing = clock
 
             -- add client as connected
@@ -110,8 +110,6 @@ local function listen()
                 print("Transfer: "..data.transfer)
                 print("Mode: "..data.mode)
                 print("Status: "..data.status)
-
-                
             elseif msg.messageData.peripheral == _G.MessageDataPeripheral.Capacitor then
                 print("Client: "..data.name)
                 print("ID: "..data.id)
@@ -122,6 +120,8 @@ local function listen()
             end
 
             print("Connected clients: "..connectedClientsCount)
+            print("Energy Meters: "..energyMetersCount)
+            print("Capacitors: "..capacitorsCount)
             -- Write to terminal
             term.redirect(term.native())
         end
