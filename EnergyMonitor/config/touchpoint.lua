@@ -152,6 +152,10 @@ local Button = {
 		end
 		self:draw()
 	end,
+	setLabel = function(self, name, label)
+		self.buttonList[name].label = setupLabel(self.buttonList[name].xMax - self.buttonList[name].xMin + 1, self.buttonList[name].yMin, self.buttonList[name].yMax, label)
+		self:draw()
+	end,
 }
 
 function new(monSide)

@@ -261,6 +261,7 @@ function initClasses()
     shell.run(binPath.."mekanism/MekanismEnergyStorage.lua")
     shell.run(binPath.."Peripherals.lua")
     shell.run(binPath.."Language.lua")
+	shell.run("/EnergyMonitor/config/input.lua")
 	shell.run(binPath.."transport/startup.lua")
     shell.run(binPath.."transport/Message.lua")
 end
