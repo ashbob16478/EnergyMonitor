@@ -27,7 +27,7 @@ _G.touchpointLocation = {}
 
 --===== Functions for loading and saving the options =====
 
-local repoUrl = "https://gitlab.com/seekerscomputercraft/extremereactorcontrol/-/raw/"
+local repoUrl = "https://raw.githubusercontent.com/TrickShotMLG02/EnergyMonitor/"
 
 function  _G.debugOutput(message) 
 	if  _G.debugEnabled == 1 then
@@ -110,14 +110,13 @@ function _G.checkUpdates()
 	end
 
 	--Get Remote version file
-	downloadFile(repoUrl..currBranch.."/",currBranch..".ver")
+	downloadFile(repoUrl..currBranch.."/EnergyMonitor/",currBranch..".ver")
 
 	--Compare local and remote version
 	local file = fs.open(currBranch..".ver","r")
 	local remoteVer = file.readLine()
 	file.close()
 	
-	print("Energy Storage Devices: "..(#capacitors + 1))
 	print("localVer: "..version)
 	
     if remoteVer == nil then
@@ -285,8 +284,8 @@ debugOutput("Initializing Network Devices")
 _G.initPeripherals()
 
 -- check for updates in gitlab/github branch (NOT NEEDED)
---debugOutput("Checking for Updates")
---checkUpdates()
+debugOutput("Checking for Updates")
+checkUpdates()
 
 --Run program or main menu, based on the settings
 if mainMenu then
