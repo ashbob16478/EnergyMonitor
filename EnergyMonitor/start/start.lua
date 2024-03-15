@@ -55,7 +55,6 @@ function _G.loadOptionFile()
 	_G.meterType = optionList["meterType"]
 	_G.debugEnabled = optionList["debug"]
 	_G.lang = optionList["language"]
-	_G.location = optionList["location"]
 	_G.modemChannel = optionList["modemChannel"]
 end
 
@@ -76,8 +75,6 @@ function _G.refreshOptionList()
 	optionList["meterType"] = meterType
 	debugOutput("Variable: lang")
 	optionList["language"] = lang
-	debugOutput("Variable: location")
-	optionList["location"] = location
 	debugOutput("Variable: modemChannel")
 	optionList["modemChannel"] = modemChannel
 	optionList["debug"] = debug

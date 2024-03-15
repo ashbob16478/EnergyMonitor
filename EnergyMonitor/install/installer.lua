@@ -25,8 +25,6 @@ elseif #arg == 2 or #arg == 3 then
  --Select branch
  if arg[2] == "stable" then branch = "main"
  elseif arg[2] == "main" then branch = "main"
- elseif arg[2] == "develop" then branch = "develop"
- elseif arg[2] == "unstable" then branch = "develop"
  else
    error("Invalid 2nd argument!")
  end
