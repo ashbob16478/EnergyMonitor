@@ -128,6 +128,22 @@ function updateOptionFileWithLanguage()
 	  fileSave.close()
 end
 
+function updateOptionFile(option, value)
+    local fileRead = fs.open("/EnergyMonitor/config/options.txt","r")
+    local optionList = textutils.unserialise(fileRead.readAll())
+    fileRead.close()
+    
+    optionList[option] = value
+
+    --Serialise the table
+    local optList = textutils.serialise(optionList)
+
+    --Save optionList to the config file
+    local fileSave = fs.open("/EnergyMonitor/config/options.txt","w")
+    fileSave.writeLine(optList)
+    fileSave.close()
+end
+
 function downloadAndRead(fileName)
 	writeFile(fileName)
 	local fileData = fs.open("/EnergyMonitor/"..fileName,"r")
@@ -190,6 +206,40 @@ if not update then
   write(selectedLang:getText("pressEnter"))
   leer = read()
 
+
+  -----------------------------------------------------------
+  -- Ask if server or client and ask for user to input lbl --
+  -----------------------------------------------------------
+  print(selectedLang:getText("installerServerOrClient"))
+  term.write("Input: ")
+    local programType = read()
+    local meterType = ""
+    if pcType == "s" then
+      programType = "server"
+    elseif pcType == "c" then
+      programType = "client"
+
+      print(selectedLang:getText("installerClientMeterOrStorage"))
+      local clientType = read()
+      term.write("Input: ")
+      if clientType == "m" then
+        meterType = "meter"
+
+        print(selectedLang:getText("installerClientMeterType"))
+        meterType = tonumber(read())
+
+      elseif clientType == "s" then
+        meterType = "storage"
+      else
+        error(selectedLang:getText("installerInvalidInput"))
+      end
+
+    else
+      error(selectedLang:getText("installerInvalidInput"))
+    end
+
+
+
   --Computer label
   local out = true
   while out do
@@ -201,7 +251,10 @@ if not update then
     local input = read()
     if selectedLang:yesCheck(input) then
       print()
-      shell.run("label set \"ReactorControlComputer\"")
+      print(selectedLang:getText("installerLabelInfo"))
+
+      local lbl = read()
+      shell.run("label set " .. lbl)
       print()
       print(selectedLang:getText("installerLabelSet"))
       print()
@@ -273,6 +326,14 @@ end
 term.clear()
 term.setCursorPos(1,1)
 updateOptionFileWithLanguage()
+
+--settings
+updateOptionFile("program", programType)
+updateOptionFile("meterType", meterType)
+
+-- update options file with program to run and meter/storage
+
+
 
 --Install complete
 term.clear()
