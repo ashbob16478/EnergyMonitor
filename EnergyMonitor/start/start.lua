@@ -182,7 +182,7 @@ function _G.doUpdate(toVer,branch)
 	print(_G.language:getText("updateProgram"))
 	term.write("Input: ")
 
---[[
+--
     --Run Counter for installation skipping
     local count = 10
     local out = false
@@ -200,7 +200,7 @@ function _G.doUpdate(toVer,branch)
 
             if event == "key" then
 
-                if p1 == 36 or p1 == 21 then
+                if p1 == 90 or p1 == 98 then
                     shell.run("/EnergyMonitor/install/installer.lua update "..branch)
                     out = true
                     break
@@ -223,7 +223,7 @@ function _G.doUpdate(toVer,branch)
             break
         end
     end
---]]
+--
 end
 
 --Download Files (For Remote version file)
