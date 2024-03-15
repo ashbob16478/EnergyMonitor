@@ -21,13 +21,9 @@ local energyMetersCount = 0
 local debugPrint = false
 
 
-local pages = {}
 local currentPageId = 1
-local totalPageCount = 1
-local currentPage = {}
-
-currentPage = touchpoint.new(_G.touchpointLocation)
-pages[currentPageId] = currentPage
+local totalPageCount = 10
+local currentPage = touchpoint.new(_G.touchpointLocation)
 
 
 local function totalEnergy()
@@ -256,12 +252,6 @@ local function setupMonitor()
     -------------------------------
     -- EnergyMeter Display Cells --
     -------------------------------
-
-    local meterCount = energyMetersCount
-    local neededPages = math.ceil(meterCount / 4)   -- 4 meters per page  (ceiled)
-    --SETUP PAGES and add them to page table. Also call setupMonitor in interval since the amount of cells might change
-    --Buttons next/prev used to inc/dec pageIndex
-
     local vertOffset = capMaxY + lh + 4
     local horiOffset = 5
 
@@ -395,7 +385,7 @@ local function setupMonitor()
     --# coordinates are minX, minY, maxX, maxY. The button will be drawn from (minX, minY) to (maxX, maxY)
     currentPage:add("Prev", function() toggle(currentPage, "Prev") end, pMinX, pMinY, pMaxX, pMaxY, colors.red, colors.lime)
     currentPage:add("Next", function() toggle(currentPage, "Next") end, nMinX, nMinY, nMaxX, nMaxY, colors.red, colors.lime)
-    currentPage:add("Page " .. currentPageId .. "/" .. totalPageCount, function() end, lMinX, lMinY, lMaxX, lMaxY, colors.red, colors.lime)
+    currentPage:add("Page", function() end, lMinX, lMinY, lMaxX, lMaxY, colors.red, colors.lime)
 
     
     currentPage:draw()
@@ -405,9 +395,77 @@ end
 local function updateMonitorValues()
     while true do
 
+        -- Header
         currentPage:setLabel("Energy", _G.numberToEnergyUnit(totalEnergy()) .. "/" .. _G.numberToEnergyUnit(totalMaxEnergy()) .. " (" .. _G.formatDecimals(energyPercentage(), 1) .. "%)")
         currentPage:setLabel("OutputRate", "Out: ".. _G.numberToEnergyUnit(totalOutputRate()) .. "/t")
         currentPage:setLabel("InputRate", "In: ".. _G.numberToEnergyUnit(totalInputRate()) .. "/t")
+
+
+        -- Footer
+        currentPage:setLabel("Page", "Page: " .. currentPageId .. "/" .. totalPageCount)
+
+
+        -- EnergyMeter Display Values
+        local meters = energyMeters
+        table.sort(meters, function(a,b) return a.name < b.name end)
+        local metersWithIdx = {}
+        local idx = 0
+        
+        for k, v in pairs(meters) do
+            idx = idx + 1
+            metersWithIdx[idx] = v
+        end
+        local meterCount = energyMetersCount
+        totalPageCount = math.ceil(meterCount / 4)
+
+        -- meters for every display
+        local dp1 = metersWithIdx[currentPageId * 4 - 3]
+        local dp2 = metersWithIdx[currentPageId * 4 - 2]
+        local dp3 = metersWithIdx[currentPageId * 4 - 1]
+        local dp4 = metersWithIdx[currentPageId * 4]
+
+        -- display values
+        if dp1 ~= nil then
+            currentPage:setLabel("Display1Name", dp1.name)
+            currentPage:setLabel("Display1Rate", _G.numberToEnergyUnit(dp1.data.transfer) .. "/t")
+            currentPage:setLabel("Display1State", _G.parseMeterType(dp1.data.meterType))
+        else
+            currentPage:setLabel("Display1Name", "N/A")
+            currentPage:setLabel("Display1Rate", "N/A")
+            currentPage:setLabel("Display1State", "N/A")
+        end
+
+        if dp2 ~= nil then
+            currentPage:setLabel("Display2Name", dp2.name)
+            currentPage:setLabel("Display2Rate", _G.numberToEnergyUnit(dp2.data.transfer) .. "/t")
+            currentPage:setLabel("Display2State", _G.parseMeterType(dp2.data.meterType))
+        else
+            currentPage:setLabel("Display2Name", "N/A")
+            currentPage:setLabel("Display2Rate", "N/A")
+            currentPage:setLabel("Display2State", "N/A")
+        end
+
+        if dp3 ~= nil then
+            currentPage:setLabel("Display3Name", dp3.name)
+            currentPage:setLabel("Display3Rate", _G.numberToEnergyUnit(dp3.data.transfer) .. "/t")
+            currentPage:setLabel("Display3State", _G.parseMeterType(dp3.data.meterType))
+        else
+            currentPage:setLabel("Display3Name", "N/A")
+            currentPage:setLabel("Display3Rate", "N/A")
+            currentPage:setLabel("Display3State", "N/A")
+        end
+
+        if dp4 ~= nil then
+            currentPage:setLabel("Display4Name", dp4.name)
+            currentPage:setLabel("Display4Rate", _G.numberToEnergyUnit(dp4.data.transfer) .. "/t")
+            currentPage:setLabel("Display4State", _G.parseMeterType(dp4.data.meterType))
+        else
+            currentPage:setLabel("Display4Name", "N/A")
+            currentPage:setLabel("Display4Rate", "N/A")
+            currentPage:setLabel("Display4State", "N/A")
+        end
+
+
         os.sleep(0.1)
     end
 end

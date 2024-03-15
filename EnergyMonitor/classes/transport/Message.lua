@@ -157,6 +157,15 @@ function _G.parsePeripheralType(type)
     end
 end
 
+function _G.parseMeterType(type)
+    if type == MeterType.providing then
+        return "Input"
+    elseif type == MeterType.using then
+        return "Output"
+    else
+        return "Unknown"
+    end
+end
 
 local function serializeMessage(message)
     return textutils.serialise(message)
