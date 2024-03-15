@@ -9,7 +9,7 @@
 local arg = {... }
 local update
 local branch = ""
-local repoUrl = "https://github.com/TrickShotMLG02/EnergyMonitor/tree/"
+local repoUrl = "https://raw.githubusercontent.com/TrickShotMLG02/EnergyMonitor/"
 local selectedLang = {}
 local installLang = nil
 
@@ -46,7 +46,7 @@ else
 end
 
 --Url for file downloads
-local relUrl = repoUrl..branch.."/"
+local relUrl = repoUrl..branch.."/EnergyMonitor/"
 
 --===== Functions =====
 

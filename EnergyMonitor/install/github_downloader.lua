@@ -10,9 +10,9 @@ local selectInstaller = ""
 --Branch & Relative paths to the url and path
 local installLang = "en"
 local relPath = "/EnergyMonitor/"
-local repoUrl = "https://github.com/TrickShotMLG02/EnergyMonitor/tree/"
+local repoUrl = "https://raw.githubusercontent.com/TrickShotMLG02/EnergyMonitor/"
 local branch = "main"
-local relUrl = repoUrl..branch.."/"
+local relUrl = repoUrl..branch.."/EnergyMonitor/"
 local selectedLang = {}
 
 function getLanguage()
@@ -40,28 +40,6 @@ function getLanguage()
 
 	print(selectedLang:getText("language"))
 	--selectedLang:dumpText()
-end
-
---Select the github branch to download
-function selectBranch()
-	clearTerm()
-
-	print(selectedLang:getText("selectBranchLineOne"))
-	print(selectedLang:getText("selectBranchLineTwo"))
-	print(selectedLang:getText("selectBranchLineThree"))
-	print(selectedLang:getText("selectBranchLineFour"))
-	print(selectedLang:getText("selectBranchLineFive"))
-
-	local input = read()
-	if input == "1" then
-		branch = "main"
-		relUrl = repoUrl..branch.."/"
-		install(branch)
-	else
-		print("Invalid input!")
-		sleep(2)
-		selectBranch()
-	end
 end
 
 --Removes old installations
@@ -125,5 +103,5 @@ function install(version)
 end
 
 getLanguage()
-selectBranch()
+install(branch)
 os.reboot()
