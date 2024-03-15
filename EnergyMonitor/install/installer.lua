@@ -207,9 +207,7 @@ if not update then
   leer = read()
 
 
-  -----------------------------------------------------------
-  -- Ask if server or client and ask for user to input lbl --
-  -----------------------------------------------------------
+  term.clear()
   print(selectedLang:getText("installerServerOrClient"))
   term.write("Input: ")
     local programType = read()
@@ -219,12 +217,14 @@ if not update then
     elseif pcType == "c" then
       programType = "client"
 
+      term.clear()
       print(selectedLang:getText("installerClientMeterOrStorage"))
       local clientType = read()
       term.write("Input: ")
       if clientType == "m" then
         meterType = "meter"
 
+        term.clear()
         print(selectedLang:getText("installerClientMeterType"))
         meterType = tonumber(read())
 
