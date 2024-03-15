@@ -334,9 +334,10 @@ term.setCursorPos(1,1)
 updateOptionFileWithLanguage()
 
 --settings
-updateOptionFile("program", programType)
-updateOptionFile("meterType", meterType)
-
+if not update then
+  updateOptionFile("program", programType)
+  updateOptionFile("meterType", meterType)
+end
 -- update options file with program to run and meter/storage
 
 
