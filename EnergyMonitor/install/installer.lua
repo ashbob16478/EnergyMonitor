@@ -208,6 +208,7 @@ if not update then
 
 
   term.clear()
+  term.setCursorPos(1,1)
   print(selectedLang:getText("installerServerOrClient"))
   term.write("Input: ")
     local programType = read()
@@ -218,6 +219,7 @@ if not update then
       programType = "client"
 
       term.clear()
+      term.setCursorPos(1,1)
       print(selectedLang:getText("installerClientMeterOrStorage"))
       local clientType = read()
       term.write("Input: ")
@@ -225,6 +227,7 @@ if not update then
         meterType = "meter"
 
         term.clear()
+        term.setCursorPos(1,1)
         print(selectedLang:getText("installerClientMeterType"))
         meterType = tonumber(read())
 
