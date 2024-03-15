@@ -197,10 +197,20 @@ local function listen()
     end
 end
 
-local function toggle(page, button)
+local function toggle(button)
     --toggle redstone output on front of computer
-    page:toggleButton(button)
-    rs.setOutput("front", not rs.getOutput("front"))
+    currentPage:flash(button, 0.2)
+    --rs.setOutput("front", not rs.getOutput("front"))
+
+    if button == "Prev" then
+        if currentPageId > 1 then
+            currentPageId = currentPageId - 1
+        end
+    elseif button == "Next" then
+        if currentPageId < totalPageCount then
+            currentPageId = currentPageId + 1
+        end
+    end
 end
 
 local function setupMonitor() 
@@ -383,8 +393,8 @@ local function setupMonitor()
     lMaxY = monHeight
     
     --# coordinates are minX, minY, maxX, maxY. The button will be drawn from (minX, minY) to (maxX, maxY)
-    currentPage:add("Prev", function() toggle(currentPage, "Prev") end, pMinX, pMinY, pMaxX, pMaxY, colors.red, colors.lime)
-    currentPage:add("Next", function() toggle(currentPage, "Next") end, nMinX, nMinY, nMaxX, nMaxY, colors.red, colors.lime)
+    currentPage:add("Prev", function() toggle("Prev") end, pMinX, pMinY, pMaxX, pMaxY, colors.red, colors.lime)
+    currentPage:add("Next", function() toggle("Next") end, nMinX, nMinY, nMaxX, nMaxY, colors.red, colors.lime)
     currentPage:add("Page", function() end, lMinX, lMinY, lMaxX, lMaxY, colors.red, colors.lime)
 
     
