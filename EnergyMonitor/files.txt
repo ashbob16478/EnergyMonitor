@@ -29,7 +29,7 @@
     name = "Language",
     files = {
       "lang/en.txt",
-      "lang/de.txt",
+      "lang/de.txt"
     }
   },
   program = {
@@ -37,8 +37,8 @@
     files = {
       "program/client.lua",
       "program/editOptions.lua",
-      "program/monitor.lua"
-      "program/server.lua",
+      "program/monitor.lua",
+      "program/server.lua"
     }
   },  
   start = {
