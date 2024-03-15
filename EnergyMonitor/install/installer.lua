@@ -184,6 +184,9 @@ end
 
 --===== Run installation =====
 
+local meterType = -1
+local programType = ""
+
 --load language data
 getLanguage()
 
@@ -211,11 +214,11 @@ if not update then
   term.setCursorPos(1,1)
   print(selectedLang:getText("installerServerOrClient"))
   term.write("Input: ")
-    local programType = read()
-    local meterType = ""
-    if pcType == "s" then
+    programType = read()
+    local meterTypeStr = ""
+    if programType == "s" then
       programType = "server"
-    elseif pcType == "c" then
+    elseif programType == "c" then
       programType = "client"
 
       term.clear()
@@ -224,7 +227,6 @@ if not update then
       local clientType = read()
       term.write("Input: ")
       if clientType == "m" then
-        meterType = "meter"
 
         term.clear()
         term.setCursorPos(1,1)
@@ -232,7 +234,7 @@ if not update then
         meterType = tonumber(read())
 
       elseif clientType == "s" then
-        meterType = "storage"
+
       else
         error(selectedLang:getText("installerInvalidInput"))
       end
@@ -255,6 +257,7 @@ if not update then
     if selectedLang:yesCheck(input) then
       print()
       print(selectedLang:getText("installerLabelInfo"))
+      term.write("Input: ")
 
       local lbl = read()
       shell.run("label set " .. lbl)

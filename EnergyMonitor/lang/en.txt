@@ -85,6 +85,7 @@
   installerLabelLineTwo = "Do you want to label the computer? (y/n):",
   installerLabelSet = "ComputerLabel set.",
   installerLabelNotSet = "ComputerLabel not set.",
+  installerLabelInfo = "The label is later shown on the UI as the name of the device.",
 
   installerStartupLineOne = "It is recommended to add the program to the computers' startup.",
   installerStartupLineTwo = "If you add the program to the startup, the program will automatically run when the computer is started.",
