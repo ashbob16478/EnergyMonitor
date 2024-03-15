@@ -7,6 +7,6 @@
   meterType = 1,
   controlMonitor = "",
   language = "en",
-  debug = 1,
+  debug = 0,
   modemChannel = 5
 }
