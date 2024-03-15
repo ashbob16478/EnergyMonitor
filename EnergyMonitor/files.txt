@@ -1,0 +1,51 @@
+{
+  install = {
+    name = "Install",
+    files = {
+      "install/installer.lua"
+    }
+  },
+  class = {
+    name = "Class",
+    files = {
+      "classes/base/EnergyMeter.lua",
+      "classes/base/EnergyStorage.lua",
+      "classes/mekanism/MekanismEnergyStorage.lua",
+      "classes/transport/Message.lua",
+      "classes/transport/startup.lua",
+      "classes/Language.lua",
+      "classes/Peripherals.lua"
+    }
+  },
+  config = {
+    name = "Config",
+    files = {
+      "config/input.lua",
+      "config/options.txt",
+      "config/touchpoint.lua"
+    }
+  },
+  lang = {
+    name = "Language",
+    files = {
+      "lang/en.txt",
+      "lang/de.txt",
+    }
+  },
+  program = {
+    name = "Program",
+    files = {
+      "program/client.lua",
+      "program/editOptions.lua",
+      "program/monitor.lua"
+      "program/server.lua",
+    }
+  },  
+  start = {
+    name = "Start",
+    files = {
+      "start/menu.lua",
+      "start/start.lua"
+    }
+  }
+}
