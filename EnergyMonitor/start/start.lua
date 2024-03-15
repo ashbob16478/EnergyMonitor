@@ -140,7 +140,7 @@ end
 
 function _G.doUpdate(toVer,branch)
 
-	if controlMonitor ~= nil then
+	if program ~= "client" then
 		--Set the monitor up
 		local x,y = controlMonitor.getSize()
 		controlMonitor.setBackgroundColor(colors.black)
