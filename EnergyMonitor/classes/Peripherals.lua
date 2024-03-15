@@ -78,24 +78,28 @@ function _G.checkPeripherals()
     term.clear()
     term.setCursorPos(1,1)
 
-    if controlMonitor == "" then
-        error("Monitor not found!\nPlease check and reboot the computer (Press and hold Ctrl+R)")
-    end
+    if _G.program == "server" then
 
-    --Monitor clear
-    controlMonitor.setBackgroundColor(colors.black)
-    controlMonitor.setTextColor(colors.red)
-    controlMonitor.clear()
-    controlMonitor.setCursorPos(1,1)
-    controlMonitor.setTextScale(0.5)
-    
-    --Monitor too small
-    local monX,monY = controlMonitor.getSize()
+        if controlMonitor == "" then
+            error("Control Monitor not found!\nPlease check and reboot the computer (Press and hold Ctrl+R)")
+        end
+
+        --Monitor clear
+        controlMonitor.setBackgroundColor(colors.black)
+        controlMonitor.setTextColor(colors.red)
+        controlMonitor.clear()
+        controlMonitor.setCursorPos(1,1)
+        controlMonitor.setTextScale(0.5)
+
+        --Monitor too small
+        local monX,monY = controlMonitor.getSize()
+    end
     
     -- TODO: FIX THIS CHECK LATER ON
     if _G.program == "client" then
        -- No monitor required for clients
     else
+        local monX,monY = controlMonitor.getSize()
         _G.smallMonitor = 0
         if monX ~= 79 or monY ~= 24 then
             local messageOut = _G.language:getText("monitorSize");
