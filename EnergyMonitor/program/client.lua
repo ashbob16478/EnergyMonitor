@@ -10,10 +10,10 @@ while true do
     local msg = _G.receiveMessage()
     if msg.type == MessageType.Ping and msg.sender == Sender.Server then
         print(os.clock())
-        print("I just received a message of type: ".. _G.parseType(msg.type))
-        print("The message was sent from: ".. _G.parseSender(msg.sender))
-        print("The message was: "..msg.messageData)
-        print()
+        debugOutput("I just received a message of type: ".. _G.parseType(msg.type))
+        debugOutput("The message was sent from: ".. _G.parseSender(msg.sender))
+        debugOutput("The message was: "..msg.messageData)
+        debugOutput()
     end
 
 

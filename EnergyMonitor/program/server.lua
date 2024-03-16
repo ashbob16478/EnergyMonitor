@@ -167,40 +167,32 @@ local function listen()
             end
             
             if msg.messageData.peripheral == _G.MessageDataPeripheral.EnergyMeter then
-                if debugPrint then
-                    print("Client: "..data.name)
-                    print("ID: "..data.id)
-                    print("Transfer: "..data.transfer)
-                    print("Mode: "..data.mode)
-                    print("Status: "..data.status)
-                end
+                debugOutput("Client: "..data.name)
+                debugOutput("ID: "..data.id)
+                debugOutput("Transfer: "..data.transfer)
+                debugOutput("Mode: "..data.mode)
+                debugOutput("Status: "..data.status)
             elseif msg.messageData.peripheral == _G.MessageDataPeripheral.Capacitor then
-                if debugPrint then
-                    print("Client: "..data.name)
-                    print("ID: "..data.id)
-                    print("Energy: "..data.energy)
-                    print("MaxEnergy: "..data.maxEnergy)
-                    print("Filled: "..math.floor(data.energy / data.maxEnergy * 100) .. "%")
-                    print("Status: "..data.status)
-                end
+                debugOutput("Client: "..data.name)
+                debugOutput("ID: "..data.id)
+                debugOutput("Energy: "..data.energy)
+                debugOutput("MaxEnergy: "..data.maxEnergy)
+                debugOutput("Filled: "..math.floor(data.energy / data.maxEnergy * 100) .. "%")
+                debugOutput("Status: "..data.status)
             end
 
-            if debugPrint then
-                print("Connected clients: "..connectedClientsCount)
-                print("Energy Meters: "..energyMetersCount)
-                print("Capacitors: "..capacitorsCount)
+            debugOutput("Connected clients: "..connectedClientsCount)
+            debugOutput("Energy Meters: "..energyMetersCount)
+            debugOutput("Capacitors: "..capacitorsCount)
 
-                -- Write to terminal
-                term.redirect(term.native())
-            end
+            -- Write to terminal
+            term.redirect(term.native())
         end
     end
 end
 
-local function toggle(button)
-    --toggle redstone output on front of computer
+local function changePage(button)
     currentPage:flash(button, 0.2)
-    --rs.setOutput("front", not rs.getOutput("front"))
 
     if button == "Prev" then
         if currentPageId > 1 then
@@ -393,8 +385,8 @@ local function setupMonitor()
     lMaxY = monHeight
     
     --# coordinates are minX, minY, maxX, maxY. The button will be drawn from (minX, minY) to (maxX, maxY)
-    currentPage:add("Prev", function() toggle("Prev") end, pMinX, pMinY, pMaxX, pMaxY, colors.red, colors.lime)
-    currentPage:add("Next", function() toggle("Next") end, nMinX, nMinY, nMaxX, nMaxY, colors.red, colors.lime)
+    currentPage:add("Prev", function() changePage("Prev") end, pMinX, pMinY, pMaxX, pMaxY, colors.red, colors.lime)
+    currentPage:add("Next", function() changePage("Next") end, nMinX, nMinY, nMaxX, nMaxY, colors.red, colors.lime)
     currentPage:add("Page", function() end, lMinX, lMinY, lMaxX, lMaxY, colors.red, colors.lime)
 
     
@@ -483,8 +475,6 @@ end
 local function touchListener()
     currentPage:run()
 end
-
-
 
 
 ---------------------------------------
