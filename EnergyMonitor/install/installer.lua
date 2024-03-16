@@ -366,8 +366,8 @@ if not update then
   print(selectedLang:getText("installerOutroLineThree").." ;)")
   print(selectedLang:getText("installerOutroLineFour"))
   print()
-  print("SeekerOfHonjo")
-  print("(c) 2021")
+  print("TrickShotMLG")
+  print("(c) 2024")
 
   local x,y = term.getSize()
   term.setTextColor(colors.yellow)
