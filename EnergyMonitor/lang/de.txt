@@ -82,6 +82,7 @@
   installerClientMeterType = "Wenn das Strommessgerät den ankommenden Stromfluss eines Speichers misst, schreibe eine '0', für  abgehenden eine '1'.",
 
   installerLabelLineOne = "Es wird empfohlen den Computer zu labeln.",
+  installerLabelInfo = "Das Label wird später auf der UI als Gerätename angezeigt.",
   installerLabelLineTwo = "Computer labeln? (j/n):",
   installerLabelSet = "ComputerLabel gesetzt.",
   installerLabelNotSet = "ComputerLabel wurde nicht gesetzt.",

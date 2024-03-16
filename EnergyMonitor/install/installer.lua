@@ -253,12 +253,12 @@ if not update then
     term.clear()
     term.setCursorPos(1,1)
     print(selectedLang:getText("installerLabelLineOne"))
+    print(selectedLang:getText("installerLabelInfo"))
     term.write(selectedLang:getText("installerLabelLineTwo"))
 
     local input = read()
     if selectedLang:yesCheck(input) then
       print()
-      print(selectedLang:getText("installerLabelInfo"))
       term.write("Input: ")
 
       local lbl = read()
