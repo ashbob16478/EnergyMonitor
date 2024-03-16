@@ -105,8 +105,8 @@ function _G.checkUpdates()
 	local tmpString = string.sub(version,5,5)
 	if tmpString == "" or tmpString == nil or tmpString == "r" then
 		currBranch = "main"
-	elseif tmpString == "b" then
-		currBranch = "develop"
+	elseif tmpString == "b" or tmpString == "d" then
+		currBranch = "development"
 	end
 
 	--Get Remote version file
