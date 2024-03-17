@@ -384,16 +384,17 @@ updateOptionFileWithLanguage()
 if not update then
   updateOptionFile("program", programType)
   updateOptionFile("meterType", meterType)
-else
-  --Get Remote version file
-	downloadFile(relUrl,branch..".ver")
-
-	--Compare local and remote version
-	local file = fs.open(branch..".ver","r")
-	local remoteVer = file.readLine()
-	file.close()
-  updateOptionFile("version", remoteVer)
 end
+
+--Get Remote version file
+downloadFile(relUrl,branch..".ver")
+
+--Compare local and remote version
+local file = fs.open(branch..".ver","r")
+local remoteVer = file.readLine()
+file.close()
+updateOptionFile("version", remoteVer)
+
 -- update options file with program to run and meter/storage
 
 

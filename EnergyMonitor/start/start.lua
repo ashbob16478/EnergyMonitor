@@ -102,11 +102,11 @@ function _G.checkUpdates()
 
 	--Check current branch (release or beta)
 	local currBranch = ""
-	local tmpString = string.sub(version,5,5)
-	if tmpString == "" or tmpString == nil or tmpString == "r" then
+
+	if string.find(version,"beta") or string.find(version, "development") then
+		currBranch = "beta"
+	else
 		currBranch = "main"
-	elseif tmpString == "b" or tmpString == "d" then
-		currBranch = "development"
 	end
 
 	--Get Remote version file
@@ -206,6 +206,9 @@ function _G.doUpdate(toVer,branch)
                     shell.run("/EnergyMonitor/install/installer.lua update "..branch)
                     out = true
                     break
+				elseif p1 == 78 then
+					out = true
+					break
                 end
 
             elseif event == "timer" and p1 == timer1 then
