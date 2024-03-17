@@ -341,15 +341,15 @@ term.clear()
 term.setCursorPos(1,1)
 
 print(selectedLang:getText("installerFileCheck"))
---Removes old files
 
-
+local oldConfig = {}
 if update then
   -- BACKUP CONFIG FILE IN LOCAL TABLE
-  local oldConfig = readConfigFile()
+  oldConfig = readConfigFile()
 end
 
 
+--Removes old files
 if fs.exists("/EnergyMonitor/program/") then
   shell.run("rm /EnergyMonitor/")
 end
@@ -386,10 +386,10 @@ if not update then
   updateOptionFile("meterType", meterType)
 else
   --Get Remote version file
-	downloadFile(relUrl,currBranch..".ver")
+	downloadFile(relUrl,branch..".ver")
 
 	--Compare local and remote version
-	local file = fs.open(currBranch..".ver","r")
+	local file = fs.open(branch..".ver","r")
 	local remoteVer = file.readLine()
 	file.close()
   updateOptionFile("version", remoteVer)
