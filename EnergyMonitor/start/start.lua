@@ -104,7 +104,7 @@ function _G.checkUpdates()
 	local currBranch = ""
 
 	if string.find(version,"beta") or string.find(version, "development") then
-		currBranch = "beta"
+		currBranch = "development"
 	else
 		currBranch = "main"
 	end
