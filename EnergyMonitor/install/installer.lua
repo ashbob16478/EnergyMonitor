@@ -112,6 +112,29 @@ function getURL(path)
 	end
 end
 
+
+function readConfigFile()
+  local fileRead = fs.open("/EnergyMonitor/config/options.txt","r")
+  local optionList = textutils.unserialise(fileRead.readAll())
+  fileRead.close()
+  return optionList
+end
+
+
+function updateConfigFile(oldConfig)
+  local newConfig = fs.open("/EnergyMonitor/config/options.txt","w")
+
+  -- check if key from oldConfig exists in newConfig, if so copy
+  for k, v in pairs(oldConfig) do
+    if newConfig[k] ~= nil then
+      newConfig[k] = oldConfig[k]
+    end
+  end
+
+  fileSave.writeLine(textutils.serialise(newConfig))
+  fileSave.close()
+end
+
 --Saves all data basck to the options.txt file
 function updateOptionFileWithLanguage()
 
@@ -312,6 +335,12 @@ term.setCursorPos(1,1)
 
 print(selectedLang:getText("installerFileCheck"))
 --Removes old files
+
+
+-- BACKUP CONFIG FILE IN LOCAL TABLE
+local oldConfig = readConfigFile()
+
+
 if fs.exists("/EnergyMonitor/program/") then
   shell.run("rm /EnergyMonitor/")
 end
@@ -320,6 +349,11 @@ print(selectedLang:getText("installerGettingNewFiles"))
 getAllFiles()
 term.clear()
 term.setCursorPos(1,1)
+
+
+-- write back updated config file
+updateConfigFile(oldConfig)
+
 
 print(selectedLang:getText("updatingStartup"))
 --Refresh startup (if installed)
