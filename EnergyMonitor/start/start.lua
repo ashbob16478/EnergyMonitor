@@ -141,8 +141,8 @@ function _G.checkUpdates()
 		print("Couldn't get remote version from gitlab.")
 	else
 		-- only used to check for update since eg. 1.1-XXX > 1.1.5-XXX
-		vNum = string.sub(version, 0, string,find(version, "-")-1)
-		rvNum = string.sub(remoteVer, 0, string,find(remoteVer, "-")-1)
+		vNum = string.sub(version, 0, string.find(version, "-")-1)
+		rvNum = string.sub(remoteVer, 0, string.find(remoteVer, "-")-1)
 
 		print("remoteVer: "..remoteVer)
 		print("Update? -> "..tostring(rvNum > vNum))
