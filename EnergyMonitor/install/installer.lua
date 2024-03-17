@@ -344,8 +344,10 @@ print(selectedLang:getText("installerFileCheck"))
 --Removes old files
 
 
--- BACKUP CONFIG FILE IN LOCAL TABLE
-local oldConfig = readConfigFile()
+if update then
+  -- BACKUP CONFIG FILE IN LOCAL TABLE
+  local oldConfig = readConfigFile()
+end
 
 
 if fs.exists("/EnergyMonitor/program/") then
@@ -358,8 +360,10 @@ term.clear()
 term.setCursorPos(1,1)
 
 
--- write back updated config file
-updateConfigFile(oldConfig)
+if update then
+  -- write back updated config file
+  updateConfigFile(oldConfig)
+end
 
 
 print(selectedLang:getText("updatingStartup"))
