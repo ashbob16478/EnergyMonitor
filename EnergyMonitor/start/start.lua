@@ -110,7 +110,25 @@ function _G.checkUpdates()
 	end
 
 	--Get Remote version file
-	downloadFile(repoUrl..currBranch.."/EnergyMonitor/",currBranch..".ver")
+	local success, ErrorStatement = pcall(downloadFile, repoUrl..currBranch.."/EnergyMonitor/",currBranch..".ver")
+	local tries = 1
+
+	-- Retry 10 times to get the remote version file otherwise continue
+	while not success do
+
+		if tries < 10 then 
+			-- used to prevent errors on server start due to computercraft http problems while server is starting
+			print("Couldn't get remote version from github. Retrying in 5 seconds...")
+			os.sleep(5)
+			success, ErrorStatement = pcall(downloadFile, repoUrl..currBranch.."/EnergyMonitor/",currBranch..".ver")
+		else 
+			print("Couldn't get remote version from github. Continuing...")
+			return
+		end
+		
+	end
+	
+	--downloadFile(repoUrl..currBranch.."/EnergyMonitor/",currBranch..".ver")
 
 	--Compare local and remote version
 	local file = fs.open(currBranch..".ver","r")
