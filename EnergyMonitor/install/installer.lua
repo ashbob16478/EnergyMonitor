@@ -126,6 +126,17 @@ function updateConfigFile(oldConfig)
   local newConfig = textutils.unserialise(fileRead.readAll())
   fileRead.close()
 
+  
+  print(oldConfig)
+  os.sleep(5)
+  term.clear()
+  term.setCursorPos(1,1)
+  print(newConfig)
+  os.sleep(5)
+  term.clear()
+  term.setCursorPos(1,1)
+
+
   -- check if key from oldConfig exists in newConfig, if so copy
   for k, v in pairs(oldConfig) do
     if newConfig[k] ~= nil then
@@ -135,6 +146,14 @@ function updateConfigFile(oldConfig)
 
   --Serialise the table
   local optList = textutils.serialise(newConfig)
+
+
+  print(newConfig)
+  os.sleep(5)
+  term.clear()
+  term.setCursorPos(1,1)
+
+
 
   --Save optionList to the config file
   local fileSave = fs.open("/EnergyMonitor/config/options.txt","w")
