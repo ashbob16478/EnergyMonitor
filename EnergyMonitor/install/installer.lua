@@ -341,15 +341,15 @@ term.clear()
 term.setCursorPos(1,1)
 
 print(selectedLang:getText("installerFileCheck"))
---Removes old files
 
-
+local oldConfig = {}
 if update then
   -- BACKUP CONFIG FILE IN LOCAL TABLE
-  local oldConfig = readConfigFile()
+  oldConfig = readConfigFile()
 end
 
 
+--Removes old files
 if fs.exists("/EnergyMonitor/program/") then
   shell.run("rm /EnergyMonitor/")
 end
