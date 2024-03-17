@@ -102,6 +102,15 @@ function install(version)
 	shell.run("/EnergyMonitor/install/installer.lua install "..version.. " "..installLang)
 end
 
+if #arg == 1 then
+	if arg[1] == "stable" then branch = "main"
+	elseif arg[1] == "main" then branch = "main"
+	elseif arg[1] == "beta" then branch = "development"
+	elseif arg[1] == "development" then branch = "development"
+	else
+		error("Invalid branch!")
+	end
+end
 getLanguage()
 install(branch)
 os.reboot()

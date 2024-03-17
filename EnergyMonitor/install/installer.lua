@@ -25,6 +25,8 @@ elseif #arg == 2 or #arg == 3 then
  --Select branch
  if arg[2] == "stable" then branch = "main"
  elseif arg[2] == "main" then branch = "main"
+ elseif arg[2] == "development" then branch = "development"
+ elseif arg[2] == "beta" then branch = "development"
  else
    error("Invalid 2nd argument!")
  end
@@ -251,12 +253,12 @@ if not update then
     term.clear()
     term.setCursorPos(1,1)
     print(selectedLang:getText("installerLabelLineOne"))
+    print(selectedLang:getText("installerLabelInfo"))
     term.write(selectedLang:getText("installerLabelLineTwo"))
 
     local input = read()
     if selectedLang:yesCheck(input) then
       print()
-      print(selectedLang:getText("installerLabelInfo"))
       term.write("Input: ")
 
       local lbl = read()
@@ -364,8 +366,8 @@ if not update then
   print(selectedLang:getText("installerOutroLineThree").." ;)")
   print(selectedLang:getText("installerOutroLineFour"))
   print()
-  print("SeekerOfHonjo")
-  print("(c) 2021")
+  print("TrickShotMLG")
+  print("(c) 2024")
 
   local x,y = term.getSize()
   term.setTextColor(colors.yellow)
