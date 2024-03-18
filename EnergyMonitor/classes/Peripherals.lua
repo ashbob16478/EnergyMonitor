@@ -78,7 +78,7 @@ function _G.checkPeripherals()
     term.clear()
     term.setCursorPos(1,1)
 
-    if _G.program == "server" then
+    if _G.program == "server" or _G.program == "monitor" then
 
         if controlMonitor == "" then
             error("Control Monitor not found!\nPlease check and reboot the computer (Press and hold Ctrl+R)")
