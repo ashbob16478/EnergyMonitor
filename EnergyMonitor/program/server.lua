@@ -478,9 +478,6 @@ end
 
 local function sendMonitorData()
     while true do
-        term.clear()
-        term.setCursorPos(1,1)
-
         -- prepare data for sending to monitor
         local data = {}
         setmetatable(data, {__index = _G.MessageData})
