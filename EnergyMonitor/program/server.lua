@@ -476,6 +476,36 @@ local function touchListener()
     currentPage:run()
 end
 
+local function sendMonitorData()
+    while true do
+        -- prepare data for sending to monitor
+        local data = {}
+        setmetatable(data, {__index = _G.MessageData})
+        data.peripheral = -1
+
+        local monitorData = {}
+        setmetatable(monitorData, {__index = _G.MonitorData})
+
+        monitorData.capacitors = capacitors
+        monitorData.capacitorsCount = capacitorsCount
+        monitorData.energyMeters = energyMeters
+        monitorData.energyMetersCount = energyMetersCount
+        monitorData.storedEnergy = totalEnergy()
+        monitorData.maxEnergy = totalMaxEnergy()
+        monitorData.energyPercentage = energyPercentage()
+        monitorData.inputRate = totalInputRate()
+        monitorData.outputRate = totalOutputRate()
+
+        data.data = monitorData
+
+        -- send data to all monitors
+        local msg = _G.NewUpdateToMonitor(data)
+        _G.sendMessage(msg)
+
+        -- needed since otherwise no yield detected in parallel.waitForAll
+        os.sleep(0.1)
+    end
+end
 
 ---------------------------------------
 -- ACTUAL SERVER PROGRAM STARTS HERE --
@@ -485,7 +515,7 @@ end
 setupMonitor()
 
 -- Run the pinger and the listener and monitor updaters in parallel
-parallel.waitForAll(listen, ping_clients, updateMonitorValues, touchListener)
+parallel.waitForAll(listen, ping_clients, updateMonitorValues, touchListener, sendMonitorData)
 
 
 -------------------------------------

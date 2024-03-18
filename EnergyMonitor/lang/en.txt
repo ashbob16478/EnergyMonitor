@@ -77,7 +77,7 @@
   installerIntroLineEight = "The size of the monitor has to be 4 wide and 2 high. (Note, only needed for server)",
   installerIntroLineNine = "That's everything you have to do.",
   
-  installerServerOrClient = "If this computer is a server type 's' else 'c' for client.",
+  installerServerOrClient = "If this computer is a server type 's', if it is a remote monitor type 'm', else 'c' for client.",
   installerClientMeterOrStorage = "If this computer is attached to a energy storage type 's' else 'm' for an energy meter.",
   installerClientMeterType = "If the energymeter measures the incoming transfer rate of an energy store type '0', for outgoing '1'.",
 

@@ -250,6 +250,8 @@ if not update then
     local meterTypeStr = ""
     if programType == "s" then
       programType = "server"
+    elseif programType == "m" then
+      programType = "monitor"
     elseif programType == "c" then
       programType = "client"
 

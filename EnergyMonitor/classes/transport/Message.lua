@@ -2,11 +2,13 @@ _G.MessageType = {
     Ping = 0,          --Sent to check if the client is still alive
     Handshake = 1,     --Sent as a handshake to establish a connection from client to server
     Update = 2,        --Sent to update values to the server from the client
+    Monitor = 3,       --Sent to the monitor to update the monitor
  }
 
  _G.Sender = {
     Server = 0,
     Client = 1,
+    Monitor = 2
  }
 
 _G.MeterType = {
@@ -29,6 +31,18 @@ _G.CapacitorData = {
     energy = -1,
     maxEnergy = -1,
     status = "",
+}
+
+_G.MonitorData = {
+    capacitors = {},
+    capacitorsCount = -1,
+    energyMeters = {},
+    energyMetersCount = -1,
+    storedEnergy = -1,
+    maxEnergy = -1,
+    energyPercentage = -1,
+    inputRate = -1,
+    outputRate = -1,
 }
 
 _G.MessageDataPeripheral = {
@@ -97,6 +111,18 @@ function _G.NewUpdateFromServer(messageData)
     return message
 end
 
+
+
+function _G.NewUpdateToMonitor(messageData)
+    local message = {}
+    setmetatable(message,{__index = Message})
+
+    message.messageData = messageData
+    message.type = MessageType.Monitor
+    message.sender = Sender.Server
+
+    return message
+end
 
 
 
