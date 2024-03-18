@@ -113,6 +113,18 @@ end
 
 
 
+function _G.NewUpdateToMonitor(messageData)
+    local message = {}
+    setmetatable(message,{__index = Message})
+
+    message.messageData = messageData
+    message.type = MessageType.Monitor
+    message.sender = Sender.Server
+
+    return message
+end
+
+
 
 function _G.NewPingToServer()
     local message = {}

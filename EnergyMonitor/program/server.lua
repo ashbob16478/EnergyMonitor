@@ -499,8 +499,7 @@ local function sendMonitorData()
         data.data = monitorData
 
         -- send data to all monitors
-        local msg = _G.NewUpdateFromServer(data)
-        msg.type = _G.MessageType.Monitor
+        local msg = _G.NewUpdateToMonitor(data)
         _G.sendMessage(msg)
 
         -- needed since otherwise no yield detected in parallel.waitForAll

@@ -30,7 +30,6 @@ local function listen()
         local msg = _G.receiveMessage()
 
         if msg.type == _G.MessageType.Monitor and msg.sender == _G.Sender.Server then
-            print(msg)
 
             -- extract data from message
             local data = msg.messageData.data
