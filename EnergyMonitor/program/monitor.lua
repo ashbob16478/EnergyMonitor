@@ -33,6 +33,7 @@ local function listen()
         term.clear()
         term.setCursorPos(1,1)
         print(clock)
+        print("Receiving monitor data from server on channel: ".._G.modemChannel)
 
         if msg.type == _G.MessageType.Monitor and msg.sender == _G.Sender.Server then
 
