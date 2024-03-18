@@ -263,8 +263,8 @@ local function updateMonitorValues()
 
         -- Header
         currentPage:setLabel("Energy", _G.numberToEnergyUnit(storedEnergy) .. "/" .. _G.numberToEnergyUnit(maxEnergy) .. " (" .. _G.formatDecimals(energyPercentage, 1) .. "%)")
-        currentPage:setLabel("OutputRate", "Out: ".. _G.numberToEnergyUnit(inputRate) .. "/t")
-        currentPage:setLabel("InputRate", "In: ".. _G.numberToEnergyUnit(outputRate) .. "/t")
+        currentPage:setLabel("OutputRate", "Out: ".. _G.numberToEnergyUnit(outputRate) .. "/t")
+        currentPage:setLabel("InputRate", "In: ".. _G.numberToEnergyUnit(inputRate) .. "/t")
 
 
         -- Footer
