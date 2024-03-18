@@ -1,11 +1,12 @@
 {
   mainMenu = false,
-  backgroundColor = 128,
-  version = "1.4-release",
-  textColor = 1,
+  autoUpdate = 1,
+  version = "1.6.2-release",
   program = "server",
   meterType = 1,
   language = "en",
-  debug = 0,
-  modemChannel = 5
+  backgroundColor = 128,
+  textColor = 1,
+  modemChannel = 5,
+  debug = 0
 }

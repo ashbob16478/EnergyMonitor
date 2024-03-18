@@ -19,6 +19,7 @@ _G.location = ""
 _G.modemChannel = 0
 _G.wirelessModemLocation = "top"
 _G.language = {}
+_G.autoUpdate = 1
 
 --TouchpointLocation (same as the monitor)
 _G.touchpointLocation = {}
@@ -56,6 +57,7 @@ function _G.loadOptionFile()
 	_G.debugEnabled = optionList["debug"]
 	_G.lang = optionList["language"]
 	_G.modemChannel = optionList["modemChannel"]
+	_G.autoUpdate = optionList["autoUpdate"]
 end
 
 --Refreshes the options list
@@ -78,6 +80,8 @@ function _G.refreshOptionList()
 	debugOutput("Variable: modemChannel")
 	optionList["modemChannel"] = modemChannel
 	optionList["debug"] = debug
+	debugOutput("Variable: autoUpdate")
+	optionList["autoUpdate"] = autoUpdate
 end
 
 --Saves all data back to the options.txt file
@@ -213,6 +217,11 @@ function _G.doUpdate(toVer,branch)
 
     term.setCursorPos(tx/2-5,ty)
     term.write(" -- 10 -- ")
+
+	if autoUpdate == 1 then
+		shell.run("/EnergyMonitor/install/installer.lua update "..branch)
+		return
+	end
 
     while true do
 
