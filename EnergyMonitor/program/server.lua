@@ -112,8 +112,6 @@ local function dropNotRespondingClients()
     end
 end
 
-print("THIS IS THE SERVER PROGRAM!")
-
 local function ping_clients()
     while true do
         term.clear()
@@ -393,7 +391,6 @@ local function setupMonitor()
     currentPage:draw()
 end
 
-
 local function updateMonitorValues()
     while true do
 
@@ -510,6 +507,7 @@ end
 ---------------------------------------
 -- ACTUAL SERVER PROGRAM STARTS HERE --
 ---------------------------------------
+print("THIS IS THE SERVER PROGRAM!")
 
 -- setup monitor gui
 setupMonitor()
