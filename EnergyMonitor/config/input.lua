@@ -18,7 +18,16 @@ function _G.numberToEnergyUnit(number)
 
   local unit = "FE"
   local value = 0
-  if number >= 1000000000000000 then
+  if number >= 1000000000000000000000000 then
+    unit = "YFE"
+    value = number / 1000000000000000000000
+  elseif number >= 1000000000000000000000 then
+    unit = "ZFE"
+    value = number / 1000000000000000000
+  elseif number >= 1000000000000000000 then
+    unit = "EFE"
+    value = number / 1000000000000000
+  elseif number >= 1000000000000000 then
     unit = "PFE"
     value = number / 1000000000000
   elseif number >= 1000000000000 then
