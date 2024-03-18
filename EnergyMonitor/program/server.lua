@@ -476,6 +476,34 @@ local function touchListener()
     currentPage:run()
 end
 
+local function sendMonitorData()
+    while true do
+        term.clear()
+        term.setCursorPos(1,1)
+
+        print(os.clock())
+        print("Sending data to all monitors on channel: ".._G.modemChannel)
+
+        -- prepare data for sending to monitor
+        local msgData = {}
+        msgData.capacitors = capacitors
+        msgData.capacitorsCount = capacitorsCount
+        msgData.energyMeters = energyMeters
+        msgData.energyMetersCount = energyMetersCount
+        msgData.storedEnergy = totalEnergy()
+        msgData.maxEnergy = totalMaxEnergy()
+        msgData.energyPercentage = energyPercentage()
+        msgData.inputRate = totalInputRate()
+        msgData.outputRate = totalOutputRate()
+
+        -- send data to all monitors
+        local msg = _G.NewUpdateFromServer(msgData)
+        _G.sendMessage(msg)
+
+        -- needed since otherwise no yield detected in parallel.waitForAll
+        os.sleep(0.1)
+    end
+end
 
 ---------------------------------------
 -- ACTUAL SERVER PROGRAM STARTS HERE --
@@ -485,7 +513,7 @@ end
 setupMonitor()
 
 -- Run the pinger and the listener and monitor updaters in parallel
-parallel.waitForAll(listen, ping_clients, updateMonitorValues, touchListener)
+parallel.waitForAll(listen, ping_clients, updateMonitorValues, touchListener, sendMonitorData)
 
 
 -------------------------------------

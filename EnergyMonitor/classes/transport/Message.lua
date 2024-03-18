@@ -7,6 +7,7 @@ _G.MessageType = {
  _G.Sender = {
     Server = 0,
     Client = 1,
+    Monitor = 2
  }
 
 _G.MeterType = {
@@ -29,6 +30,18 @@ _G.CapacitorData = {
     energy = -1,
     maxEnergy = -1,
     status = "",
+}
+
+_G.MonitorData = {
+    capacitors = {},
+    capacitorsCount = -1,
+    energyMeters = {},
+    energyMetersCount = -1,
+    storedEnergy = -1,
+    maxEnergy = -1,
+    energyPercentage = -1,
+    inputRate = -1,
+    outputRate = -1,
 }
 
 _G.MessageDataPeripheral = {
