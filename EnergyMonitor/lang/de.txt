@@ -77,7 +77,7 @@
   installerIntroLineEight = "Der Monitor muss 3 Blöcke breit und 2 Blöcke hoch sein.",
   installerIntroLineNine = "Das ist alles, was du tun musst.",
     
-  installerServerOrClient = "Wenn der Computer ein server ist, schreibe ein 's' ansonsten ein 'c' für client.",
+  installerServerOrClient = "Wenn der Computer ein server ist, schreibe ein 's', für einen monitor ein 'm' und ansonsten ein 'c' für client.",
   installerClientMeterOrStorage = "Wenn der Computer an einen Stromspeicher angeschlossen ist schreibe ein 's' ansonsten ein 'm' für ein Strommessgerät.",
   installerClientMeterType = "Wenn das Strommessgerät den ankommenden Stromfluss eines Speichers misst, schreibe eine '0', für  abgehenden eine '1'.",
 
