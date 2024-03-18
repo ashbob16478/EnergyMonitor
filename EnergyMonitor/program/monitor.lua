@@ -30,9 +30,11 @@ local function listen()
         local msg = _G.receiveMessage()
 
         if msg.type == _G.MessageType.Monitor and msg.sender == _G.Sender.Server then
+            print(msg)
+
             -- extract data from message
             local data = msg.messageData.data
-            
+
             capacitors = data.capacitors
             capacitorsCount = data.capacitorsCount
             energyMeters = data.energyMeters
@@ -93,7 +95,6 @@ local function setupMonitor()
     
     currentPage:add("Energy Stored:", function() end, capMinX, capMinY, capMaxX, capMaxY, colors.red, colors.lime)
     currentPage:add("Energy", function() end, capMinX, capMinY + lh, capMaxX, capMaxY + lh, colors.red, colors.lime)
-    print(totalPageCount)
 
 
 
@@ -112,7 +113,6 @@ local function setupMonitor()
 
     currentPage:add("OutputRate", function() end, trnsfMinX, trnsfMinY, trnsfMaxX, trnsfMaxY, colors.red, colors.lime)
     currentPage:add("InputRate", function() end, trnsfMinX, trnsfMinY + lh, trnsfMaxX, trnsfMaxY + lh, colors.red, colors.lime)
-    print(totalPageCount)
 
 
 
