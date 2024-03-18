@@ -481,23 +481,29 @@ local function sendMonitorData()
         term.clear()
         term.setCursorPos(1,1)
 
-        print(os.clock())
-        print("Sending data to all monitors on channel: ".._G.modemChannel)
-
         -- prepare data for sending to monitor
-        local msgData = {}
-        msgData.capacitors = capacitors
-        msgData.capacitorsCount = capacitorsCount
-        msgData.energyMeters = energyMeters
-        msgData.energyMetersCount = energyMetersCount
-        msgData.storedEnergy = totalEnergy()
-        msgData.maxEnergy = totalMaxEnergy()
-        msgData.energyPercentage = energyPercentage()
-        msgData.inputRate = totalInputRate()
-        msgData.outputRate = totalOutputRate()
+        local data = {}
+        setmetatable(data, {__index = _G.MessageData})
+        data.peripheral = -1
+
+        local monitorData = {}
+        setmetatable(monitorData, {__index = _G.MonitorData})
+
+        monitorData.capacitors = capacitors
+        monitorData.capacitorsCount = capacitorsCount
+        monitorData.energyMeters = energyMeters
+        monitorData.energyMetersCount = energyMetersCount
+        monitorData.storedEnergy = totalEnergy()
+        monitorData.maxEnergy = totalMaxEnergy()
+        monitorData.energyPercentage = energyPercentage()
+        monitorData.inputRate = totalInputRate()
+        monitorData.outputRate = totalOutputRate()
+
+        data.data = monitorData
 
         -- send data to all monitors
-        local msg = _G.NewUpdateFromServer(msgData)
+        local msg = _G.NewUpdateFromServer(data)
+        msg.type = _G.MessageType.Monitor
         _G.sendMessage(msg)
 
         -- needed since otherwise no yield detected in parallel.waitForAll

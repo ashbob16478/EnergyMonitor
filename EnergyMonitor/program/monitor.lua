@@ -29,9 +29,10 @@ local function listen()
         local clock = os.clock()
         local msg = _G.receiveMessage()
 
-        if msg.type == _G.MessageType.Update and msg.sender == _G.Sender.Server then
+        if msg.type == _G.MessageType.Monitor and msg.sender == _G.Sender.Server then
             -- extract data from message
             local data = msg.messageData.data
+            
             capacitors = data.capacitors
             capacitorsCount = data.capacitorsCount
             energyMeters = data.energyMeters

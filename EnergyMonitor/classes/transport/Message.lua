@@ -2,6 +2,7 @@ _G.MessageType = {
     Ping = 0,          --Sent to check if the client is still alive
     Handshake = 1,     --Sent as a handshake to establish a connection from client to server
     Update = 2,        --Sent to update values to the server from the client
+    Monitor = 3,       --Sent to the monitor to update the monitor
  }
 
  _G.Sender = {
