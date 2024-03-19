@@ -126,7 +126,48 @@ local function setupMonitor()
     -- EnergyMeter Display Cells --
     -------------------------------
     local vertOffset = capMaxY + lh + 4
-    local horiOffset = 5
+    local dpBorder = 2
+
+
+    ---------------------------
+    -- CALCULATE FLEX LAYOUT --
+    ---------------------------
+    local dpWidth = 14 -- inner width of a single display cell
+    local dpWidthTotal = dpWidth + 2 * dpBorder -- total width of a single display cell including border on both sides
+
+    local dpHeight = 2 -- inner height of a single display cell
+    local dpHeightTotal = dpHeight + 2 * dpBorder -- total height of a single display cell including border on both sides
+
+
+    -- within this area we can fit display cells with a width of dpWidth and a height of 3x dpHeight
+    local areaMinX = 0
+    local areaMinY = vertOffset
+    local areaMaxX = monWidth
+    local areaMaxY = monHeight
+
+    -- calculate how many cells fit horizontally
+    local cellsPerRow = math.floor((areaMaxX - areaMinX) / (dpWidthTotal))
+
+    -- calculate how many cells fit vertically
+    local cellsPerCol = math.floor((areaMaxY - areaMinY) / (dpHeightTotal))
+
+    -- calculate the total number of cells that fit
+    local totalCells = cellsPerRow * cellsPerCol
+
+    -- build display cells consisting of a name, a rate and a state label
+    for r = 1, cellsPerRow do
+        for c = 1, cellsPerCol do
+            local cellMinX = areaMinX + (r - 1) * dpWidthTotal
+            local cellMinY = areaMinY + (c - 1) * dpHeightTotal
+            local cellMaxX = cellMinX + dpWidth
+            local cellMaxY = cellMinY + dpHeight
+
+            currentPage:add("Display"..(r + (c - 1) * cellsPerRow).."Name", function() end, cellMinX, cellMinY, cellMaxX, cellMaxY, colors.red, colors.lime)
+            currentPage:add("Display"..(r + (c - 1) * cellsPerRow).."Rate", function() end, cellMinX, cellMinY + 1, cellMaxX, cellMaxY + 1, colors.red, colors.lime)
+            currentPage:add("Display"..(r + (c - 1) * cellsPerRow).."State", function() end, cellMinX, cellMinY + 2, cellMaxX, cellMaxY + 2, colors.red, colors.lime)
+        end
+    end
+
 
     ---------------
     -- DISPLAY 1 --
@@ -150,9 +191,9 @@ local function setupMonitor()
     dp1MaxX3 = dpWidth + dp1MinX3
     dp1MaxY3 = dpHeight + dp1MinY3
 
-    currentPage:add("Display1Name", function() end, dp1MinX1, dp1MinY1, dp1MaxX1, dp1MaxY1, colors.red, colors.lime)
-    currentPage:add("Display1Rate", function() end, dp1MinX2, dp1MinY2, dp1MaxX2, dp1MaxY2, colors.red, colors.lime)
-    currentPage:add("Display1State", function() end, dp1MinX3, dp1MinY3, dp1MaxX3, dp1MaxY3, colors.red, colors.lime)
+    --currentPage:add("Display1Name", function() end, dp1MinX1, dp1MinY1, dp1MaxX1, dp1MaxY1, colors.red, colors.lime)
+    --currentPage:add("Display1Rate", function() end, dp1MinX2, dp1MinY2, dp1MaxX2, dp1MaxY2, colors.red, colors.lime)
+    --currentPage:add("Display1State", function() end, dp1MinX3, dp1MinY3, dp1MaxX3, dp1MaxY3, colors.red, colors.lime)
 
 
     ---------------
@@ -174,9 +215,9 @@ local function setupMonitor()
     dp2MaxX3 = dpWidth + dp2MinX3
     dp2MaxY3 = dpHeight + dp2MinY3
 
-    currentPage:add("Display2Name", function() end, dp2MinX1, dp2MinY1, dp2MaxX1, dp2MaxY1, colors.red, colors.lime)
-    currentPage:add("Display2Rate", function() end, dp2MinX2, dp2MinY2, dp2MaxX2, dp2MaxY2, colors.red, colors.lime)
-    currentPage:add("Display2State", function() end, dp2MinX3, dp2MinY3, dp2MaxX3, dp2MaxY3, colors.red, colors.lime)
+    --currentPage:add("Display2Name", function() end, dp2MinX1, dp2MinY1, dp2MaxX1, dp2MaxY1, colors.red, colors.lime)
+    --currentPage:add("Display2Rate", function() end, dp2MinX2, dp2MinY2, dp2MaxX2, dp2MaxY2, colors.red, colors.lime)
+    --currentPage:add("Display2State", function() end, dp2MinX3, dp2MinY3, dp2MaxX3, dp2MaxY3, colors.red, colors.lime)
 
 
     ---------------
@@ -198,9 +239,9 @@ local function setupMonitor()
     dp3MaxX3 = dpWidth + dp3MinX3
     dp3MaxY3 = dpHeight + dp3MinY3
 
-    currentPage:add("Display3Name", function() end, dp3MinX1, dp3MinY1, dp3MaxX1, dp3MaxY1, colors.red, colors.lime)
-    currentPage:add("Display3Rate", function() end, dp3MinX2, dp3MinY2, dp3MaxX2, dp3MaxY2, colors.red, colors.lime)
-    currentPage:add("Display3State", function() end, dp3MinX3, dp3MinY3, dp3MaxX3, dp3MaxY3, colors.red, colors.lime)
+    --currentPage:add("Display3Name", function() end, dp3MinX1, dp3MinY1, dp3MaxX1, dp3MaxY1, colors.red, colors.lime)
+    --currentPage:add("Display3Rate", function() end, dp3MinX2, dp3MinY2, dp3MaxX2, dp3MaxY2, colors.red, colors.lime)
+   -- currentPage:add("Display3State", function() end, dp3MinX3, dp3MinY3, dp3MaxX3, dp3MaxY3, colors.red, colors.lime)
 
 
     ---------------
@@ -222,9 +263,9 @@ local function setupMonitor()
     dp4MaxX3 = dpWidth + dp4MinX3
     dp4MaxY3 = dpHeight + dp4MinY3
 
-    currentPage:add("Display4Name", function() end, dp4MinX1, dp4MinY1, dp4MaxX1, dp4MaxY1, colors.red, colors.lime)
-    currentPage:add("Display4Rate", function() end, dp4MinX2, dp4MinY2, dp4MaxX2, dp4MaxY2, colors.red, colors.lime)
-    currentPage:add("Display4State", function() end, dp4MinX3, dp4MinY3, dp4MaxX3, dp4MaxY3, colors.red, colors.lime)
+    --currentPage:add("Display4Name", function() end, dp4MinX1, dp4MinY1, dp4MaxX1, dp4MaxY1, colors.red, colors.lime)
+    --currentPage:add("Display4Rate", function() end, dp4MinX2, dp4MinY2, dp4MaxX2, dp4MaxY2, colors.red, colors.lime)
+    --currentPage:add("Display4State", function() end, dp4MinX3, dp4MinY3, dp4MaxX3, dp4MaxY3, colors.red, colors.lime)
 
 
 
