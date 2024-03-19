@@ -2,7 +2,11 @@ local basalt = require("basalt")
 
 local displayData = {
     clientInfo = {},
-    display = {}
+    displayFrm = {},
+    dpName = "",
+    dpRate = "",
+    dpType = "",
+    dpState = ""
 }
 
 local capacitors = {}
@@ -25,14 +29,28 @@ setmetatable(displayCells, {__index = "displayData"})
 -- GUI COMPONENT SETTINGS
 
 local headerHeight = 4
-local footerHeight = 4
+local footerHeight = 3
+local versionFooterHeight = 1
 
 local btnWidth,btnHeight = 6,1
 
 -- prev/next button, page lbl size
 local lblWidth,lblHeight = 20, btnHeight
 
-local cellWidth, cellHeight = 15, 4
+local cellWidth, cellHeight = 18, 6
+local cellBackground = colors.yellow
+
+local headerColor = colors.blue
+local bgColor = colors.black
+local footerColor = colors.green
+local versionFooterColor = colors.lightBlue
+
+if true then
+    local c = colors.lightGray
+    headerColor = c
+    bgColor = c
+    footerColor = c
+end
 
 -- GUI COMPONENT SETTINGS END
 
@@ -44,16 +62,26 @@ local main = basalt.addMonitor()
 main:setMonitor(_G.controlMonitor)
 
 -- default content pane
-local flex = main:addFlexbox():setWrap("wrap"):setBackground(colors.red):setPosition(1, 1):setSize("parent.w", "parent.h"):setDirection("column"):setSpacing(0)
+local flex = main:addFlexbox():setWrap("wrap"):setBackground(colors.red):setPosition(2, 1):setSize("parent.w-2", "parent.h"):setDirection("column"):setSpacing(0)
 
 -- frame that contains the header (energy stored, input/output rates)
-local header = flex:addFrame():setBackground(colors.blue):setSize("parent.w", headerHeight)
+local header = flex:addFrame():setBackground(headerColor):setSize("parent.w", headerHeight)
 
 -- flexbox that contains the individual energy meter displays
-local main = flex:addFlexbox():setWrap("wrap"):setBackground(colors.black):setSize("parent.w", "parent.h" .. "-" .. headerHeight + footerHeight):setSpacing(1) --:setJustifyContent("space-evenly")
+local main = flex:addFlexbox():setWrap("wrap"):setBackground(bgColor):setSize("parent.w", "parent.h" .. "-" .. headerHeight + footerHeight + versionFooterHeight):setSpacing(1) --:setJustifyContent("space-evenly")
 
 -- frame that contains the footer (previous, next, page number)
-local footer = flex:addFrame():setBackground(colors.green):setSize("parent.w", footerHeight)
+local footer = flex:addFrame():setBackground(footerColor):setSize("parent.w", footerHeight)
+local versionFooter = flex:addFrame():setBackground(versionFooterColor):setSize("parent.w", 1)
+
+local pageLbl = {}
+
+local energyLbl = {}
+local energyBar = {}
+
+local rateLblIn = {}
+local rateLblOut = {}
+
 
 -- GUI COMPONENTS END
 
@@ -69,11 +97,13 @@ local function listen()
         local clock = os.clock()
         local msg = _G.receiveMessage()
 
-        term.redirect(term.native())
-        term.clear()
-        term.setCursorPos(1,1)
-        print(clock)
-        print("Receiving monitor data from server on channel: ".._G.modemChannel)
+        if debugPrint then
+            term.redirect(term.native())
+            term.clear()
+            term.setCursorPos(1,1)
+            print(clock)
+            print("Receiving monitor data from server on channel: ".._G.modemChannel)
+        end
 
         if msg.type == _G.MessageType.Monitor and msg.sender == _G.Sender.Server then
 
@@ -96,10 +126,10 @@ local function listen()
                 term.setCursorPos(1,1)
                 print(clock)
                 print("Type: " .. _G.parsePeripheralType(msg.messageData.peripheral)) 
-            end
 
-            -- Write to terminal
+                -- Write to terminal
             term.redirect(term.native())
+            end
         end
     end
 end
@@ -386,40 +416,94 @@ local function touchListener()
     currentPage:run()
 end
 
-local function updateMonitorValues()
-    while true do
-        os.sleep(0.1)
-    end
-end
-
 local function addDisplayCell(peripheralId)
     -- add display cell to the monitor
     if displayCells[peripheralId] == nil then
+        local frm = main:addFrame():setBackground(cellBackground):setSize(cellWidth, cellHeight)
+        
         displayCells[peripheralId] = {
             clientInfo = energyMeters[peripheralId],
-            display = main:addFrame():setBackground(colors.yellow):setSize(cellWidth, cellHeight)
+            displayFrm = frm,
+            dpName = frm:addLabel():setText(energyMeters[peripheralId].name):setFontSize(1):setSize("parent.w-1", 1):setPosition(2, 2):setTextAlign("center"),
+            dpRate = frm:addLabel():setText(_G.numberToEnergyUnit(energyMeters[peripheralId].data.transfer) .. "/t"):setFontSize(1):setSize("parent.w-1", 1):setPosition(2, 3):setTextAlign("center"),
+            dpType = frm:addLabel():setText(_G.parseMeterType(energyMeters[peripheralId].data.meterType)):setFontSize(1):setSize("parent.w-1", 1):setPosition(2, 4):setTextAlign("center"),
+            --dpState = frm:addLabel():setText("State: " .. energyMeters[peripheralId].data.state):setFontSize(1):setSize("parent.w-1", 1):setPosition(2, 5):setTextAlign("center")
         }
     else
         -- update values stored in table
         displayCells[peripheralId].clientInfo = energyMeters[peripheralId]
-
-        -- update display values
     end
 end
 
 local function removeDisplayCell(peripheralId)
     -- remove display cell from the monitor
+    if displayCells[peripheralId] ~= nil then
+        displayCells[peripheralId].dpName:remove()
+        displayCells[peripheralId].dpRate:remove()
+        displayCells[peripheralId].dpType:remove()
+        --displayCells[peripheralId].dpState:remove()
+        displayCells[peripheralId].displayFrm:remove()
+        displayCells[peripheralId] = nil
+    end
+end
+
+local function updateEnergyDisplay()
+    energyLbl:setText("Energy: " .. _G.numberToEnergyUnit(storedEnergy) .. "/" .. _G.numberToEnergyUnit(maxEnergy) .. " (" .. _G.formatDecimals(energyPercentage, 1) .. "%)")
+    energyBar:setProgress(tonumber(_G.formatDecimals(energyPercentage, 0)))
+end
+
+local function updateTransferDisplay()
+    rateLblIn:setText("Transfer IN: " .. _G.numberToEnergyUnit(inputRate) .. "/t")
+    rateLblOut:setText("Transfer OUT: " .. _G.numberToEnergyUnit(outputRate) .. "/t")
+end
+
+local function updateDisplayCells()
+    for k,v in pairs(displayCells) do
+        local i = v.clientInfo
+        local d = i.data
+        displayCells[k].dpName:setText(d.name)
+        displayCells[k].dpRate:setText(_G.numberToEnergyUnit(d.transfer) .. "/t")
+        displayCells[k].dpType:setText(_G.parseMeterType(d.meterType))
+        --displayCells[k].dpState:setText("State: " .. d.state)
+    end
+end
+
+local function updateMonitorValues()
+    while true do
+
+        -- iterate over all energy meters and add them to the display
+        for k,v in pairs(energyMeters) do
+            addDisplayCell(k)
+        end
+
+        -- remove all energy meters that are not in the received data
+        for k,v in pairs(displayCells) do
+            if energyMeters[k] == nil then
+                removeDisplayCell(k)
+            end
+        end
+
+        updateEnergyDisplay()
+        updateTransferDisplay()
+        updateDisplayCells()
+
+        os.sleep(0.1)
+    end
 end
 
 local function setupMonitor()
     -- setup header
-    header:addLabel():setText("HEADER"):setFontSize(1)
+    energyLbl = header:addLabel():setText("Energy: STORED"):setFontSize(1):setSize("parent.w / 2", 1):setPosition(0, 1):setTextAlign("center")
+    energyBar = header:addProgressbar():setProgress(0):setSize("parent.w / 3", 1):setPosition("1/12 * parent.w", 3):setProgressBar(colors.lime):setDirection("right"):setBackground(colors.black)
+    rateLblIn = header:addLabel():setText("Transfer: IN"):setFontSize(1):setSize("parent.w / 3", 1):setPosition("2 * parent.w / 3", 1):setTextAlign("left")
+    rateLblOut = header:addLabel():setText("Transfer: OUT" ):setFontSize(1):setSize("parent.w / 3", 1):setPosition(" 2 * parent.w / 3", 2):setTextAlign("left")
+
     
     -- setup footer
     footer:addButton():setText("Prev"):setSize(btnWidth, btnHeight):setPosition(2, math.ceil(footerHeight / 2) + math.floor(btnHeight / 2))
-    footer:addLabel():setText("Page: 1/1"):setFontSize(1):setSize(lblWidth,lblHeight):setPosition("(parent.w / 2) - " .. (lblWidth / 2), math.ceil(footerHeight / 2) + math.floor(btnHeight / 2)):setTextAlign("center")
+    pageLbl = footer:addLabel():setText("Page: 1/1"):setFontSize(1):setSize(lblWidth,lblHeight):setPosition("(parent.w / 2) - " .. (lblWidth / 2), math.ceil(footerHeight / 2) + math.floor(btnHeight / 2)):setTextAlign("center")
     footer:addButton():setText("Next"):setSize(btnWidth, btnHeight):setPosition("parent.w-"..btnWidth, math.ceil(footerHeight / 2) + math.floor(btnHeight / 2))
-    footer:addLabel():setText("version: " .. _G.version):setFontSize(1):setSize("parent.w", 1):setPosition(0, footerHeight):setTextAlign("right"):setForeground(colors.gray)
+    versionFooter:addLabel():setText("version: " .. _G.version):setFontSize(1):setSize("parent.w", 1):setPosition(0, versionFooterHeight):setTextAlign("right"):setForeground(colors.gray)
 
     -- setup display cells (each cell is one frame)
     -- for k,v in pairs(energyMeters) add display cell and store it in a new table
@@ -432,7 +516,7 @@ local function setupMonitor()
 
     --local display1 = main:addFrame():setBackground(colors.yellow):setSize(displayWidth, displayHeight)
     for i=0, 20 do
-        addDisplayCell(i)
+        --addDisplayCell(i)
     end
     --main:addButton():setSize(15,4)
     --main:addButton():setSize(15,4)
@@ -456,10 +540,9 @@ end
 ---------------------------------------
 
 -- setup monitor gui
-setupMonitor()
 
 -- Run the pinger and the listener and monitor updaters in parallel
---parallel.waitForAll(listen, updateMonitorValues, touchListener)
+parallel.waitForAll(setupMonitor, listen, updateMonitorValues)
 
 
 -------------------------------------
