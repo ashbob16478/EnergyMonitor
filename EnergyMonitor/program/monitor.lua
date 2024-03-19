@@ -1,8 +1,9 @@
---Loads the touchpoint and input APIs
-shell.run("cp /EnergyMonitor/config/touchpoint.lua /touchpoint")
-os.loadAPI("touchpoint")
-shell.run("rm touchpoint")
+local basalt = require("basalt")
 
+local displayData = {
+    clientInfo = {},
+    display = {}
+}
 
 local capacitors = {}
 local capacitorsCount = 0
@@ -16,10 +17,49 @@ local outputRate = 0
 
 local debugPrint = false
 
+-- table contrains energyMeters[i].id as key and the value is the displayData{clientInfo = energyMeters[i], display = already created frame}
+local displayCells = {}
+setmetatable(displayCells, {__index = "displayData"})
+
+
+-- GUI COMPONENT SETTINGS
+
+local headerHeight = 4
+local footerHeight = 4
+
+local btnWidth,btnHeight = 6,1
+
+-- prev/next button, page lbl size
+local lblWidth,lblHeight = 20, btnHeight
+
+local cellWidth, cellHeight = 15, 4
+
+-- GUI COMPONENT SETTINGS END
+
+
+
+-- GUI COMPONENTS
+
+local main = basalt.addMonitor()
+main:setMonitor(_G.controlMonitor)
+
+-- default content pane
+local flex = main:addFlexbox():setWrap("wrap"):setBackground(colors.red):setPosition(1, 1):setSize("parent.w", "parent.h"):setDirection("column"):setSpacing(0)
+
+-- frame that contains the header (energy stored, input/output rates)
+local header = flex:addFrame():setBackground(colors.blue):setSize("parent.w", headerHeight)
+
+-- flexbox that contains the individual energy meter displays
+local main = flex:addFlexbox():setWrap("wrap"):setBackground(colors.black):setSize("parent.w", "parent.h" .. "-" .. headerHeight + footerHeight):setSpacing(1) --:setJustifyContent("space-evenly")
+
+-- frame that contains the footer (previous, next, page number)
+local footer = flex:addFrame():setBackground(colors.green):setSize("parent.w", footerHeight)
+
+-- GUI COMPONENTS END
+
 
 local currentPageId = 1
-local totalPageCount = 10
-local currentPage = touchpoint.new(_G.touchpointLocation)
+local totalPageCount = 0
 
 print("THIS IS THE MONITOR PROGRAM!")
 
@@ -78,7 +118,7 @@ local function changePage(button)
     end
 end
 
-local function setupMonitor() 
+local function setupMonitorOLD() 
     local monWidth,monHeight = _G.controlMonitor.getSize()
     monWidth = monWidth
     monHeight = monHeight - 1
@@ -126,48 +166,7 @@ local function setupMonitor()
     -- EnergyMeter Display Cells --
     -------------------------------
     local vertOffset = capMaxY + lh + 4
-    local dpBorder = 2
-
-
-    ---------------------------
-    -- CALCULATE FLEX LAYOUT --
-    ---------------------------
-    local dpWidth = 14 -- inner width of a single display cell
-    local dpWidthTotal = dpWidth + 2 * dpBorder -- total width of a single display cell including border on both sides
-
-    local dpHeight = 2 -- inner height of a single display cell
-    local dpHeightTotal = dpHeight + 2 * dpBorder -- total height of a single display cell including border on both sides
-
-
-    -- within this area we can fit display cells with a width of dpWidth and a height of 3x dpHeight
-    local areaMinX = 0
-    local areaMinY = vertOffset
-    local areaMaxX = monWidth
-    local areaMaxY = monHeight
-
-    -- calculate how many cells fit horizontally
-    local cellsPerRow = math.floor((areaMaxX - areaMinX) / (dpWidthTotal))
-
-    -- calculate how many cells fit vertically
-    local cellsPerCol = math.floor((areaMaxY - areaMinY) / (dpHeightTotal))
-
-    -- calculate the total number of cells that fit
-    local totalCells = cellsPerRow * cellsPerCol
-
-    -- build display cells consisting of a name, a rate and a state label
-    for r = 1, cellsPerRow do
-        for c = 1, cellsPerCol do
-            local cellMinX = areaMinX + (r - 1) * dpWidthTotal
-            local cellMinY = areaMinY + (c - 1) * dpHeightTotal
-            local cellMaxX = cellMinX + dpWidth
-            local cellMaxY = cellMinY + dpHeight
-
-            currentPage:add("Display"..(r + (c - 1) * cellsPerRow).."Name", function() end, cellMinX, cellMinY, cellMaxX, cellMaxY, colors.red, colors.lime)
-            currentPage:add("Display"..(r + (c - 1) * cellsPerRow).."Rate", function() end, cellMinX, cellMinY + 1, cellMaxX, cellMaxY + 1, colors.red, colors.lime)
-            currentPage:add("Display"..(r + (c - 1) * cellsPerRow).."State", function() end, cellMinX, cellMinY + 2, cellMaxX, cellMaxY + 2, colors.red, colors.lime)
-        end
-    end
-
+    local horiOffset = 5
 
     ---------------
     -- DISPLAY 1 --
@@ -191,9 +190,9 @@ local function setupMonitor()
     dp1MaxX3 = dpWidth + dp1MinX3
     dp1MaxY3 = dpHeight + dp1MinY3
 
-    --currentPage:add("Display1Name", function() end, dp1MinX1, dp1MinY1, dp1MaxX1, dp1MaxY1, colors.red, colors.lime)
-    --currentPage:add("Display1Rate", function() end, dp1MinX2, dp1MinY2, dp1MaxX2, dp1MaxY2, colors.red, colors.lime)
-    --currentPage:add("Display1State", function() end, dp1MinX3, dp1MinY3, dp1MaxX3, dp1MaxY3, colors.red, colors.lime)
+    currentPage:add("Display1Name", function() end, dp1MinX1, dp1MinY1, dp1MaxX1, dp1MaxY1, colors.red, colors.lime)
+    currentPage:add("Display1Rate", function() end, dp1MinX2, dp1MinY2, dp1MaxX2, dp1MaxY2, colors.red, colors.lime)
+    currentPage:add("Display1State", function() end, dp1MinX3, dp1MinY3, dp1MaxX3, dp1MaxY3, colors.red, colors.lime)
 
 
     ---------------
@@ -215,9 +214,9 @@ local function setupMonitor()
     dp2MaxX3 = dpWidth + dp2MinX3
     dp2MaxY3 = dpHeight + dp2MinY3
 
-    --currentPage:add("Display2Name", function() end, dp2MinX1, dp2MinY1, dp2MaxX1, dp2MaxY1, colors.red, colors.lime)
-    --currentPage:add("Display2Rate", function() end, dp2MinX2, dp2MinY2, dp2MaxX2, dp2MaxY2, colors.red, colors.lime)
-    --currentPage:add("Display2State", function() end, dp2MinX3, dp2MinY3, dp2MaxX3, dp2MaxY3, colors.red, colors.lime)
+    currentPage:add("Display2Name", function() end, dp2MinX1, dp2MinY1, dp2MaxX1, dp2MaxY1, colors.red, colors.lime)
+    currentPage:add("Display2Rate", function() end, dp2MinX2, dp2MinY2, dp2MaxX2, dp2MaxY2, colors.red, colors.lime)
+    currentPage:add("Display2State", function() end, dp2MinX3, dp2MinY3, dp2MaxX3, dp2MaxY3, colors.red, colors.lime)
 
 
     ---------------
@@ -239,9 +238,9 @@ local function setupMonitor()
     dp3MaxX3 = dpWidth + dp3MinX3
     dp3MaxY3 = dpHeight + dp3MinY3
 
-    --currentPage:add("Display3Name", function() end, dp3MinX1, dp3MinY1, dp3MaxX1, dp3MaxY1, colors.red, colors.lime)
-    --currentPage:add("Display3Rate", function() end, dp3MinX2, dp3MinY2, dp3MaxX2, dp3MaxY2, colors.red, colors.lime)
-   -- currentPage:add("Display3State", function() end, dp3MinX3, dp3MinY3, dp3MaxX3, dp3MaxY3, colors.red, colors.lime)
+    currentPage:add("Display3Name", function() end, dp3MinX1, dp3MinY1, dp3MaxX1, dp3MaxY1, colors.red, colors.lime)
+    currentPage:add("Display3Rate", function() end, dp3MinX2, dp3MinY2, dp3MaxX2, dp3MaxY2, colors.red, colors.lime)
+    currentPage:add("Display3State", function() end, dp3MinX3, dp3MinY3, dp3MaxX3, dp3MaxY3, colors.red, colors.lime)
 
 
     ---------------
@@ -263,9 +262,9 @@ local function setupMonitor()
     dp4MaxX3 = dpWidth + dp4MinX3
     dp4MaxY3 = dpHeight + dp4MinY3
 
-    --currentPage:add("Display4Name", function() end, dp4MinX1, dp4MinY1, dp4MaxX1, dp4MaxY1, colors.red, colors.lime)
-    --currentPage:add("Display4Rate", function() end, dp4MinX2, dp4MinY2, dp4MaxX2, dp4MaxY2, colors.red, colors.lime)
-    --currentPage:add("Display4State", function() end, dp4MinX3, dp4MinY3, dp4MaxX3, dp4MaxY3, colors.red, colors.lime)
+    currentPage:add("Display4Name", function() end, dp4MinX1, dp4MinY1, dp4MaxX1, dp4MaxY1, colors.red, colors.lime)
+    currentPage:add("Display4Rate", function() end, dp4MinX2, dp4MinY2, dp4MaxX2, dp4MaxY2, colors.red, colors.lime)
+    currentPage:add("Display4State", function() end, dp4MinX3, dp4MinY3, dp4MaxX3, dp4MaxY3, colors.red, colors.lime)
 
 
 
@@ -305,7 +304,7 @@ local function setupMonitor()
     currentPage:draw()
 end
 
-local function updateMonitorValues()
+local function updateMonitorValuesOLD()
     while true do
 
         -- Header
@@ -387,6 +386,70 @@ local function touchListener()
     currentPage:run()
 end
 
+local function updateMonitorValues()
+    while true do
+        os.sleep(0.1)
+    end
+end
+
+local function addDisplayCell(peripheralId)
+    -- add display cell to the monitor
+    if displayCells[peripheralId] == nil then
+        displayCells[peripheralId] = {
+            clientInfo = energyMeters[peripheralId],
+            display = main:addFrame():setBackground(colors.yellow):setSize(cellWidth, cellHeight)
+        }
+    else
+        -- update values stored in table
+        displayCells[peripheralId].clientInfo = energyMeters[peripheralId]
+
+        -- update display values
+    end
+end
+
+local function removeDisplayCell(peripheralId)
+    -- remove display cell from the monitor
+end
+
+local function setupMonitor()
+    -- setup header
+    header:addLabel():setText("HEADER"):setFontSize(1)
+    
+    -- setup footer
+    footer:addButton():setText("Prev"):setSize(btnWidth, btnHeight):setPosition(2, math.ceil(footerHeight / 2) + math.floor(btnHeight / 2))
+    footer:addLabel():setText("Page: 1/1"):setFontSize(1):setSize(lblWidth,lblHeight):setPosition("(parent.w / 2) - " .. (lblWidth / 2), math.ceil(footerHeight / 2) + math.floor(btnHeight / 2)):setTextAlign("center")
+    footer:addButton():setText("Next"):setSize(btnWidth, btnHeight):setPosition("parent.w-"..btnWidth, math.ceil(footerHeight / 2) + math.floor(btnHeight / 2))
+    footer:addLabel():setText("version: " .. _G.version):setFontSize(1):setSize("parent.w", 1):setPosition(0, footerHeight):setTextAlign("right"):setForeground(colors.gray)
+
+    -- setup display cells (each cell is one frame)
+    -- for k,v in pairs(energyMeters) add display cell and store it in a new table
+    -- check on listen if there is a new energy meter which is not stored locally and thus add it to the table and the display
+    -- check on listen if there is an energy meter which is stored locally but not in the received data and thus remove it from the table and the display
+    -- eg. by subtracting local table from remote table to get the disconnected devices
+    -- eg. by subtracting remote table from local table to get the newly added devices
+
+    -- OR by creating table with peripheralId as key and the value is the frame object and on listen check for every received energy meter if it is already stored in the table and if not add it to the table and the display. If it is stored in the table, update the display values. If it is not in the remote table but in the local table, remove it from the table and the display
+
+    --local display1 = main:addFrame():setBackground(colors.yellow):setSize(displayWidth, displayHeight)
+    for i=0, 20 do
+        addDisplayCell(i)
+    end
+    --main:addButton():setSize(15,4)
+    --main:addButton():setSize(15,4)
+    --main:addButton():setFlexBasis(1):setFlexGrow(1)
+    --main:addButton():setFlexBasis(1):setFlexGrow(1)
+    --main:addButton():setFlexBasis(1):setFlexGrow(1)
+    --main:addButton():setFlexBasis(1):setFlexGrow(1)
+    --main:addButton():setFlexBasis(1):setFlexGrow(1)
+    --main:addButton():setFlexBasis(1):setFlexGrow(1)
+    
+
+
+
+
+    -- auto update the monitor
+    basalt.autoUpdate()
+end
 
 ---------------------------------------
 -- ACTUAL SERVER PROGRAM STARTS HERE --
@@ -396,7 +459,7 @@ end
 setupMonitor()
 
 -- Run the pinger and the listener and monitor updaters in parallel
-parallel.waitForAll(listen, updateMonitorValues, touchListener)
+--parallel.waitForAll(listen, updateMonitorValues, touchListener)
 
 
 -------------------------------------
