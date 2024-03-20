@@ -38,6 +38,7 @@ local footerColor = colors.green
 local btnWidth,btnHeight = 6,1
 local lblWidth,lblHeight = 20, btnHeight
 local btnDefaultColor, btnClickedColor = colors.gray, colors.lime
+local btnHighlighDuration = 0.2
 
 -- version footer settings
 local versionFooterHeight = 1
@@ -292,9 +293,17 @@ local function setupMonitor()
 
     
     -- setup footer
-    prevBtn = footer:addButton():setText("Prev"):setSize(btnWidth, btnHeight):setPosition(2, math.ceil(footerHeight / 2) + math.floor(btnHeight / 2)):setBackground(btnDefaultColor):onClick(prevPage)--:onClick(function(self) self:setBackground(btnClickedColor) end, prevPage):onRelease(function(self) self:setBackground(btnDefaultColor) end)
+    prevBtn = footer:addButton():setText("Prev"):setSize(btnWidth, btnHeight):setPosition(2, math.ceil(footerHeight / 2) + math.floor(btnHeight / 2)):setBackground(btnDefaultColor):onClick(basalt.schedule(function(self)
+        self:setBackground(btnClickedColor)
+        sleep(btnHighlighDuration)
+        self:setBackground(btnDefaultColor)
+      end), prevPage)
     pageLbl = footer:addLabel():setText("Page: 0/0"):setFontSize(1):setSize(lblWidth,lblHeight):setPosition("(parent.w / 2) - " .. (lblWidth / 2), math.ceil(footerHeight / 2) + math.floor(btnHeight / 2)):setTextAlign("center")
-    nextBtn = footer:addButton():setText("Next"):setSize(btnWidth, btnHeight):setPosition("parent.w-"..btnWidth, math.ceil(footerHeight / 2) + math.floor(btnHeight / 2)):setBackground(btnDefaultColor):onClick(nextPage)--:onClick(function(self) self:setBackground(btnClickedColor) end, prevPage):nextPage(function(self) self:setBackground(btnDefaultColor) end)
+    nextBtn = footer:addButton():setText("Next"):setSize(btnWidth, btnHeight):setPosition("parent.w-"..btnWidth, math.ceil(footerHeight / 2) + math.floor(btnHeight / 2)):setBackground(btnDefaultColor):onClick(basalt.schedule(function(self)
+        self:setBackground(btnClickedColor)
+        sleep(btnHighlighDuration)
+        self:setBackground(btnDefaultColor)
+      end), nextPage)
     versionFooter:addLabel():setText("version: " .. _G.version):setFontSize(1):setSize("parent.w", 1):setPosition(0, versionFooterHeight):setTextAlign("right"):setForeground(colors.gray)
 
     -- auto update the monitor
