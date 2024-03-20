@@ -37,6 +37,7 @@ local footerHeight = 3
 local footerColor = colors.green
 local btnWidth,btnHeight = 6,1
 local lblWidth,lblHeight = 20, btnHeight
+local btnDefaultColor, btnClickedColor = colors.gray, colors.lime
 
 -- version footer settings
 local versionFooterHeight = 1
@@ -80,6 +81,8 @@ local main = flex:addFlexbox():setWrap("wrap"):setBackground(bgColor):setSize("p
 
 -- frame that contains the footer (previous, next, page number)
 local footer = flex:addFrame():setBackground(footerColor):setSize("parent.w", footerHeight)
+local prevBtn = {}
+local nextBtn = {}
 local versionFooter = flex:addFrame():setBackground(versionFooterColor):setSize("parent.w", 1)
 
 -- amount of cells per page
@@ -289,9 +292,9 @@ local function setupMonitor()
 
     
     -- setup footer
-    footer:addButton():setText("Prev"):setSize(btnWidth, btnHeight):setPosition(2, math.ceil(footerHeight / 2) + math.floor(btnHeight / 2)):onClick(prevPage)
+    prevBtn = footer:addButton():setText("Prev"):setSize(btnWidth, btnHeight):setPosition(2, math.ceil(footerHeight / 2) + math.floor(btnHeight / 2)):onClick(prevPage):setBackground(btnDefaultColor)
     pageLbl = footer:addLabel():setText("Page: 0/0"):setFontSize(1):setSize(lblWidth,lblHeight):setPosition("(parent.w / 2) - " .. (lblWidth / 2), math.ceil(footerHeight / 2) + math.floor(btnHeight / 2)):setTextAlign("center")
-    footer:addButton():setText("Next"):setSize(btnWidth, btnHeight):setPosition("parent.w-"..btnWidth, math.ceil(footerHeight / 2) + math.floor(btnHeight / 2)):onClick(nextPage)
+    nextBtn = footer:addButton():setText("Next"):setSize(btnWidth, btnHeight):setPosition("parent.w-"..btnWidth, math.ceil(footerHeight / 2) + math.floor(btnHeight / 2)):onClick(nextPage):setBackground(btnDefaultColor)
     versionFooter:addLabel():setText("version: " .. _G.version):setFontSize(1):setSize("parent.w", 1):setPosition(0, versionFooterHeight):setTextAlign("right"):setForeground(colors.gray)
 
     -- auto update the monitor
@@ -305,7 +308,6 @@ print("THIS IS THE MONITOR PROGRAM!")
 
 -- Run the pinger and the listener and monitor updaters in parallel
 parallel.waitForAll(setupMonitor, listen, updateMonitorValues)
-
 
 -------------------------------------
 -- ACTUAL SERVER PROGRAM ENDS HERE --
