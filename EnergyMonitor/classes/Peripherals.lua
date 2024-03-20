@@ -101,7 +101,7 @@ function _G.checkPeripherals()
     else
         local monX,monY = controlMonitor.getSize()
         _G.smallMonitor = 0
-        if monX ~= 79 or monY ~= 24 then
+        if monX < 79 or monY < 24 then
             local messageOut = _G.language:getText("monitorSize");
             controlMonitor.write(messageOut)
             error(messageOut)
