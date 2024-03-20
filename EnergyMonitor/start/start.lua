@@ -220,6 +220,7 @@ function _G.doUpdate(toVer,branch)
 
 	if autoUpdate == 1 then
 		shell.run("/EnergyMonitor/install/installer.lua update "..branch)
+		os.reboot()
 		return
 	end
 
@@ -236,6 +237,7 @@ function _G.doUpdate(toVer,branch)
                 if p1 == 90 or p1 == 98 then
                     shell.run("/EnergyMonitor/install/installer.lua update "..branch)
                     out = true
+					os.reboot()
                     break
 				elseif p1 == 78 then
 					out = true
