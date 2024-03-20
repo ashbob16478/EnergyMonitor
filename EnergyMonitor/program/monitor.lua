@@ -28,29 +28,33 @@ setmetatable(displayCells, {__index = "displayData"})
 
 -- GUI COMPONENT SETTINGS
 
+-- header settings
 local headerHeight = 4
+local headerColor = colors.blue
+
+-- footer settings (including prev/next buttons and page label)
 local footerHeight = 3
-local versionFooterHeight = 1
-
+local footerColor = colors.green
 local btnWidth,btnHeight = 6,1
-
--- prev/next button, page lbl size
 local lblWidth,lblHeight = 20, btnHeight
 
+-- version footer settings
+local versionFooterHeight = 1
+local versionFooterColor = colors.lightBlue
+
+
+-- all settings for displayed cells
 local cellWidth, cellHeight = 18, 6
 local cellBackground = colors.yellow
 local cellSpacing = 1
 
-local headerColor = colors.blue
-local bgColor = colors.black
-local footerColor = colors.green
-local versionFooterColor = colors.lightBlue
+-- background Color
+local bgColor = colors.lightGray
 
-if true then
-    local c = colors.lightGray
-    headerColor = c
-    bgColor = c
-    footerColor = c
+-- if not debug mode, set header and footer color to bgColor
+if not debugPrint then
+    headerColor = bgColor
+    footerColor = bgColor
 end
 
 -- GUI COMPONENT SETTINGS END
@@ -59,6 +63,9 @@ end
 
 -- GUI COMPONENTS
 
+local displayedCells = {}
+
+-- create main window
 local main = basalt.addMonitor()
 main:setMonitor(_G.controlMonitor)
 
@@ -81,7 +88,7 @@ local numCellsRow = math.floor((flexWidth + cellSpacing) / (cellWidth + cellSpac
 local numCellsCol = math.floor((flexHeight + cellSpacing) / (cellHeight + cellSpacing))
 local totalCellsPerPage = numCellsRow * numCellsCol
 
-
+-- static elements with dynamic content
 local pageLbl = {}
 
 local energyLbl = {}
@@ -90,14 +97,12 @@ local energyBar = {}
 local rateLblIn = {}
 local rateLblOut = {}
 
-
 -- GUI COMPONENTS END
 
-
+-- page settings
 local currentPageId = 1
 local totalPageCount = 1
 
-print("THIS IS THE MONITOR PROGRAM!")
 
 local function listen()
     -- Receive data from server
@@ -142,17 +147,38 @@ local function listen()
     end
 end
 
-local function showPage()
+local function reloadPage()
     -- iterate over table with displays and hide all except the ones that are on the current page
     local startIdx = (currentPageId - 1) * totalCellsPerPage + 1
     local endIdx = currentPageId * totalCellsPerPage
     local currIdx = 1
 
-    for k,v in pairs(displayCells) do
+    -- remove all cells from the monitor
+    for k,v in pairs(displayedCells) do
+        v:remove()
+    end
+
+    -- add cells to the monitor
+    for k,v in pairs(energyMeters) do
         if currIdx >= startIdx and currIdx <= endIdx then
-            v.displayFrm:setVisible(true)
-        else
-            v.displayFrm:setVisible(false)
+
+            -- calculate relative index on the current page
+            local relIdx = currIdx - startIdx + 1
+
+            -- create new cell for every idx shown on the current page
+            local frm = main:addFrame():setBackground(cellBackground):setSize(cellWidth, cellHeight)
+
+            local peripheralId = energyMeters[k].id
+            displayCells[peripheralId] = {
+                clientInfo = energyMeters[peripheralId],
+                displayFrm = frm,
+                dpName = frm:addLabel():setText(energyMeters[peripheralId].name):setFontSize(1):setSize("parent.w-1", 1):setPosition(2, 2):setTextAlign("center"),
+                dpRate = frm:addLabel():setText(_G.numberToEnergyUnit(energyMeters[peripheralId].data.transfer) .. "/t"):setFontSize(1):setSize("parent.w-1", 1):setPosition(2, 3):setTextAlign("center"),
+                dpType = frm:addLabel():setText(_G.parseMeterType(energyMeters[peripheralId].data.meterType)):setFontSize(1):setSize("parent.w-1", 1):setPosition(2, 4):setTextAlign("center"),
+                --dpState = frm:addLabel():setText("State: " .. energyMeters[peripheralId].data.state):setFontSize(1):setSize("parent.w-1", 1):setPosition(2, 5):setTextAlign("center")
+            }
+
+            displayedCells[relIdx] = frm
         end
         currIdx = currIdx + 1
     end
@@ -161,18 +187,8 @@ end
 local function addDisplayCell(peripheralId)
     -- add display cell to the monitor
     if displayCells[peripheralId] == nil then
-        local frm = main:addFrame():setBackground(cellBackground):setSize(cellWidth, cellHeight)
-        
-        displayCells[peripheralId] = {
-            clientInfo = energyMeters[peripheralId],
-            displayFrm = frm,
-            dpName = frm:addLabel():setText(energyMeters[peripheralId].name):setFontSize(1):setSize("parent.w-1", 1):setPosition(2, 2):setTextAlign("center"),
-            dpRate = frm:addLabel():setText(_G.numberToEnergyUnit(energyMeters[peripheralId].data.transfer) .. "/t"):setFontSize(1):setSize("parent.w-1", 1):setPosition(2, 3):setTextAlign("center"),
-            dpType = frm:addLabel():setText(_G.parseMeterType(energyMeters[peripheralId].data.meterType)):setFontSize(1):setSize("parent.w-1", 1):setPosition(2, 4):setTextAlign("center"),
-            --dpState = frm:addLabel():setText("State: " .. energyMeters[peripheralId].data.state):setFontSize(1):setSize("parent.w-1", 1):setPosition(2, 5):setTextAlign("center")
-        }
-
-        showPage()
+        -- reload page and update displayed cells
+        reloadPage()
     else
         -- update values stored in table
         displayCells[peripheralId].clientInfo = energyMeters[peripheralId]
@@ -185,7 +201,8 @@ local function removeDisplayCell(peripheralId)
         displayCells[peripheralId].displayFrm:remove()
         displayCells[peripheralId] = nil
 
-        showPage()
+        -- reload page and update displayed cells
+        reloadPage()
     end
 end
 
@@ -216,8 +233,9 @@ local function updatePageCount()
 
     -- set currentPageId to last page if last page got deleted
     if currentPageId > totalPageCount then
-        -- currentPageId = totalPageCount
+        currentPageId = totalPageCount
         -- DOES NOT WORK CORRECTLY TODO
+        reloadPage()
     end
 end
 
@@ -239,7 +257,10 @@ local function updateMonitorValues()
         updateEnergyDisplay()
         updateTransferDisplay()
         updateDisplayCells()
-        updatePageCount()
+        
+        if energyMetersCount > 0 then
+            updatePageCount()
+        end
 
         os.sleep(0.1)
     end
@@ -248,14 +269,14 @@ end
 local function nextPage()
     if currentPageId < totalPageCount then
         currentPageId = currentPageId + 1
-        showPage()
+        reloadPage()
     end
 end
 
 local function prevPage()
     if currentPageId > 1 then
         currentPageId = currentPageId - 1
-        showPage()
+        reloadPage()
     end
 end
 
@@ -273,7 +294,6 @@ local function setupMonitor()
     footer:addButton():setText("Next"):setSize(btnWidth, btnHeight):setPosition("parent.w-"..btnWidth, math.ceil(footerHeight / 2) + math.floor(btnHeight / 2)):onClick(nextPage)
     versionFooter:addLabel():setText("version: " .. _G.version):setFontSize(1):setSize("parent.w", 1):setPosition(0, versionFooterHeight):setTextAlign("right"):setForeground(colors.gray)
 
-
     -- auto update the monitor
     basalt.autoUpdate()
 end
@@ -281,8 +301,7 @@ end
 ---------------------------------------
 -- ACTUAL SERVER PROGRAM STARTS HERE --
 ---------------------------------------
-
--- setup monitor gui
+print("THIS IS THE MONITOR PROGRAM!")
 
 -- Run the pinger and the listener and monitor updaters in parallel
 parallel.waitForAll(setupMonitor, listen, updateMonitorValues)
