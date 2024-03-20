@@ -39,6 +39,7 @@ local lblWidth,lblHeight = 20, btnHeight
 
 local cellWidth, cellHeight = 18, 6
 local cellBackground = colors.yellow
+local cellSpacing = 1
 
 local headerColor = colors.blue
 local bgColor = colors.black
@@ -62,17 +63,24 @@ local main = basalt.addMonitor()
 main:setMonitor(_G.controlMonitor)
 
 -- default content pane
-local flex = main:addFlexbox():setWrap("wrap"):setBackground(colors.red):setPosition(2, 1):setSize("parent.w-2", "parent.h"):setDirection("column"):setSpacing(0)
+local flex = main:addFlexbox():setWrap("wrap"):setBackground(colors.red):setPosition(1, 1):setSize("parent.w", "parent.h"):setDirection("column"):setSpacing(0)
 
 -- frame that contains the header (energy stored, input/output rates)
 local header = flex:addFrame():setBackground(headerColor):setSize("parent.w", headerHeight)
 
 -- flexbox that contains the individual energy meter displays
-local main = flex:addFlexbox():setWrap("wrap"):setBackground(bgColor):setSize("parent.w", "parent.h" .. "-" .. headerHeight + footerHeight + versionFooterHeight):setSpacing(1) --:setJustifyContent("space-evenly")
+local main = flex:addFlexbox():setWrap("wrap"):setBackground(bgColor):setSize("parent.w", "parent.h" .. "-" .. headerHeight + footerHeight + versionFooterHeight):setSpacing(cellSpacing):setJustifyContent("center")--:setOffset(-1, 0) --:setJustifyContent("space-evenly")
 
 -- frame that contains the footer (previous, next, page number)
 local footer = flex:addFrame():setBackground(footerColor):setSize("parent.w", footerHeight)
 local versionFooter = flex:addFrame():setBackground(versionFooterColor):setSize("parent.w", 1)
+
+-- amount of cells per page
+local flexWidth, flexHeight = main:getSize()
+local numCellsRow = math.floor((flexWidth + cellSpacing) / (cellWidth + cellSpacing))
+local numCellsCol = math.floor((flexHeight + cellSpacing) / (cellHeight + cellSpacing))
+local totalCellsPerPage = numCellsRow * numCellsCol
+
 
 local pageLbl = {}
 
@@ -87,7 +95,7 @@ local rateLblOut = {}
 
 
 local currentPageId = 1
-local totalPageCount = 0
+local totalPageCount = 1
 
 print("THIS IS THE MONITOR PROGRAM!")
 
@@ -416,6 +424,22 @@ local function touchListener()
     currentPage:run()
 end
 
+local function showPage()
+    -- iterate over table with displays and hide all except the ones that are on the current page
+    local startIdx = (currentPageId - 1) * totalCellsPerPage + 1
+    local endIdx = currentPageId * totalCellsPerPage
+    local currIdx = 1
+
+    for k,v in pairs(displayCells) do
+        if currIdx >= startIdx and currIdx <= endIdx then
+            v.displayFrm:setVisible(true)
+        else
+            v.displayFrm:setVisible(false)
+        end
+        currIdx = currIdx + 1
+    end
+end
+
 local function addDisplayCell(peripheralId)
     -- add display cell to the monitor
     if displayCells[peripheralId] == nil then
@@ -429,6 +453,8 @@ local function addDisplayCell(peripheralId)
             dpType = frm:addLabel():setText(_G.parseMeterType(energyMeters[peripheralId].data.meterType)):setFontSize(1):setSize("parent.w-1", 1):setPosition(2, 4):setTextAlign("center"),
             --dpState = frm:addLabel():setText("State: " .. energyMeters[peripheralId].data.state):setFontSize(1):setSize("parent.w-1", 1):setPosition(2, 5):setTextAlign("center")
         }
+
+        showPage()
     else
         -- update values stored in table
         displayCells[peripheralId].clientInfo = energyMeters[peripheralId]
@@ -438,12 +464,10 @@ end
 local function removeDisplayCell(peripheralId)
     -- remove display cell from the monitor
     if displayCells[peripheralId] ~= nil then
-        displayCells[peripheralId].dpName:remove()
-        displayCells[peripheralId].dpRate:remove()
-        displayCells[peripheralId].dpType:remove()
-        --displayCells[peripheralId].dpState:remove()
         displayCells[peripheralId].displayFrm:remove()
         displayCells[peripheralId] = nil
+
+        showPage()
     end
 end
 
@@ -468,6 +492,17 @@ local function updateDisplayCells()
     end
 end
 
+local function updatePageCount()
+    totalPageCount = math.ceil(energyMetersCount / totalCellsPerPage)
+    pageLbl:setText("Page: " .. currentPageId .. "/" .. totalPageCount)
+
+    -- set currentPageId to last page if last page got deleted
+    if currentPageId > totalPageCount then
+        -- currentPageId = totalPageCount
+        -- DOES NOT WORK CORRECTLY TODO
+    end
+end
+
 local function updateMonitorValues()
     while true do
 
@@ -486,8 +521,23 @@ local function updateMonitorValues()
         updateEnergyDisplay()
         updateTransferDisplay()
         updateDisplayCells()
+        updatePageCount()
 
         os.sleep(0.1)
+    end
+end
+
+local function nextPage()
+    if currentPageId < totalPageCount then
+        currentPageId = currentPageId + 1
+        showPage()
+    end
+end
+
+local function prevPage()
+    if currentPageId > 1 then
+        currentPageId = currentPageId - 1
+        showPage()
     end
 end
 
@@ -500,35 +550,10 @@ local function setupMonitor()
 
     
     -- setup footer
-    footer:addButton():setText("Prev"):setSize(btnWidth, btnHeight):setPosition(2, math.ceil(footerHeight / 2) + math.floor(btnHeight / 2))
-    pageLbl = footer:addLabel():setText("Page: 1/1"):setFontSize(1):setSize(lblWidth,lblHeight):setPosition("(parent.w / 2) - " .. (lblWidth / 2), math.ceil(footerHeight / 2) + math.floor(btnHeight / 2)):setTextAlign("center")
-    footer:addButton():setText("Next"):setSize(btnWidth, btnHeight):setPosition("parent.w-"..btnWidth, math.ceil(footerHeight / 2) + math.floor(btnHeight / 2))
+    footer:addButton():setText("Prev"):setSize(btnWidth, btnHeight):setPosition(2, math.ceil(footerHeight / 2) + math.floor(btnHeight / 2)):onClick(prevPage)
+    pageLbl = footer:addLabel():setText("Page: 0/0"):setFontSize(1):setSize(lblWidth,lblHeight):setPosition("(parent.w / 2) - " .. (lblWidth / 2), math.ceil(footerHeight / 2) + math.floor(btnHeight / 2)):setTextAlign("center")
+    footer:addButton():setText("Next"):setSize(btnWidth, btnHeight):setPosition("parent.w-"..btnWidth, math.ceil(footerHeight / 2) + math.floor(btnHeight / 2)):onClick(nextPage)
     versionFooter:addLabel():setText("version: " .. _G.version):setFontSize(1):setSize("parent.w", 1):setPosition(0, versionFooterHeight):setTextAlign("right"):setForeground(colors.gray)
-
-    -- setup display cells (each cell is one frame)
-    -- for k,v in pairs(energyMeters) add display cell and store it in a new table
-    -- check on listen if there is a new energy meter which is not stored locally and thus add it to the table and the display
-    -- check on listen if there is an energy meter which is stored locally but not in the received data and thus remove it from the table and the display
-    -- eg. by subtracting local table from remote table to get the disconnected devices
-    -- eg. by subtracting remote table from local table to get the newly added devices
-
-    -- OR by creating table with peripheralId as key and the value is the frame object and on listen check for every received energy meter if it is already stored in the table and if not add it to the table and the display. If it is stored in the table, update the display values. If it is not in the remote table but in the local table, remove it from the table and the display
-
-    --local display1 = main:addFrame():setBackground(colors.yellow):setSize(displayWidth, displayHeight)
-    for i=0, 20 do
-        --addDisplayCell(i)
-    end
-    --main:addButton():setSize(15,4)
-    --main:addButton():setSize(15,4)
-    --main:addButton():setFlexBasis(1):setFlexGrow(1)
-    --main:addButton():setFlexBasis(1):setFlexGrow(1)
-    --main:addButton():setFlexBasis(1):setFlexGrow(1)
-    --main:addButton():setFlexBasis(1):setFlexGrow(1)
-    --main:addButton():setFlexBasis(1):setFlexGrow(1)
-    --main:addButton():setFlexBasis(1):setFlexGrow(1)
-    
-
-
 
 
     -- auto update the monitor
