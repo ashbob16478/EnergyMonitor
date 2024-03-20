@@ -178,7 +178,7 @@ local function reloadPage()
                 dpName = frm:addLabel():setText(energyMeters[peripheralId].name):setFontSize(1):setSize("parent.w-1", 1):setPosition(2, 2):setTextAlign("center"),
                 dpRate = frm:addLabel():setText(_G.numberToEnergyUnit(energyMeters[peripheralId].data.transfer) .. "/t"):setFontSize(1):setSize("parent.w-1", 1):setPosition(2, 3):setTextAlign("center"),
                 dpType = frm:addLabel():setText(_G.parseMeterType(energyMeters[peripheralId].data.meterType)):setFontSize(1):setSize("parent.w-1", 1):setPosition(2, 4):setTextAlign("center"),
-                --dpState = frm:addLabel():setText("State: " .. energyMeters[peripheralId].data.state):setFontSize(1):setSize("parent.w-1", 1):setPosition(2, 5):setTextAlign("center")
+                dpState = frm:addLabel():setText("" .. energyMeters[peripheralId].data.status):setFontSize(1):setSize("parent.w-1", 1):setPosition(2, 5):setTextAlign("center")
             }
 
             displayedCells[relIdx] = frm
@@ -226,7 +226,7 @@ local function updateDisplayCells()
         displayCells[k].dpName:setText(d.name)
         displayCells[k].dpRate:setText(_G.numberToEnergyUnit(d.transfer) .. "/t")
         displayCells[k].dpType:setText(_G.parseMeterType(d.meterType))
-        --displayCells[k].dpState:setText("State: " .. d.state)
+        displayCells[k].dpState:setText(d.status)
     end
 end
 
