@@ -20,6 +20,7 @@ local inputRate = 0
 local outputRate = 0
 
 local debugPrint = false
+local debugUI = false
 
 -- table contrains energyMeters[i].id as key and the value is the displayData{clientInfo = energyMeters[i], display = already created frame}
 local displayCells = {}
@@ -29,7 +30,7 @@ setmetatable(displayCells, {__index = "displayData"})
 -- GUI COMPONENT SETTINGS
 
 -- header settings
-local headerHeight = 4
+local headerHeight = 5
 local headerColor = colors.blue
 
 -- footer settings (including prev/next buttons and page label)
@@ -54,7 +55,7 @@ local cellSpacing = 1
 local bgColor = colors.lightGray
 
 -- if not debug mode, set header and footer color to bgColor
-if not debugPrint then
+if not debugUI then
     headerColor = bgColor
     footerColor = bgColor
 end
@@ -78,7 +79,7 @@ local flex = main:addFlexbox():setWrap("wrap"):setBackground(colors.red):setPosi
 local header = flex:addFrame():setBackground(headerColor):setSize("parent.w", headerHeight)
 
 -- flexbox that contains the individual energy meter displays
-local main = flex:addFlexbox():setWrap("wrap"):setBackground(bgColor):setSize("parent.w", "parent.h" .. "-" .. headerHeight + footerHeight + versionFooterHeight):setSpacing(cellSpacing):setJustifyContent("center")--:setOffset(-1, 0) --:setJustifyContent("space-evenly")
+local main = flex:addFlexbox():setWrap("wrap"):setBackground(bgColor):setSize("parent.w", "parent.h" .. "-" .. headerHeight + footerHeight + versionFooterHeight):setSpacing(cellSpacing):setJustifyContent("center")--:setOffset(-1, 0)
 
 -- frame that contains the footer (previous, next, page number)
 local footer = flex:addFrame():setBackground(footerColor):setSize("parent.w", footerHeight)
@@ -179,7 +180,7 @@ local function reloadPage()
                 dpName = frm:addLabel():setText(energyMeters[peripheralId].name):setFontSize(1):setSize("parent.w-1", 1):setPosition(2, 2):setTextAlign("center"),
                 dpRate = frm:addLabel():setText(_G.numberToEnergyUnit(energyMeters[peripheralId].data.transfer) .. "/t"):setFontSize(1):setSize("parent.w-1", 1):setPosition(2, 3):setTextAlign("center"),
                 dpType = frm:addLabel():setText(_G.parseMeterType(energyMeters[peripheralId].data.meterType)):setFontSize(1):setSize("parent.w-1", 1):setPosition(2, 4):setTextAlign("center"),
-                dpState = frm:addLabel():setText("" .. energyMeters[peripheralId].data.status):setFontSize(1):setSize("parent.w-1", 1):setPosition(2, 5):setTextAlign("center")
+                dpState = frm:addLabel():setText(energyMeters[peripheralId].data.status):setFontSize(1):setSize("parent.w-1", 1):setPosition(2, 5):setTextAlign("center")
             }
 
             displayedCells[relIdx] = frm
