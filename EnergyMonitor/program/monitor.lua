@@ -42,6 +42,7 @@ local headerHeight = 4
 local headerColor = colors.blue
 local filterHeaderHeight = 3
 local filterHeaderColor = colors.lightBlue
+local filterHeaderBtnSpacing = 2
 
 -- footer settings (including prev/next buttons and page label)
 local footerHeight = 3
@@ -67,6 +68,7 @@ local bgColor = colors.lightGray
 -- if not debug mode, set header and footer color to bgColor
 if not debugUI then
     headerColor = bgColor
+    filterHeaderColor = bgColor
     footerColor = bgColor
 end
 
@@ -87,7 +89,7 @@ local flex = main:addFlexbox():setWrap("wrap"):setBackground(colors.red):setPosi
 
 -- frame that contains the header (energy stored, input/output rates)
 local header = flex:addFrame():setBackground(headerColor):setSize("parent.w", headerHeight)
-local filterHeader = flex:addFrame():setBackground(filterHeaderColor):setSize("parent.w", filterHeaderHeight)
+local filterHeader = flex:addFlexbox():setWrap("wrap"):setBackground(filterHeaderColor):setSize("parent.w", filterHeaderHeight):setSpacing(filterHeaderBtnSpacing):setJustifyContent("center")
 
 -- flexbox that contains the individual energy meter displays
 local main = flex:addFlexbox():setWrap("wrap"):setBackground(bgColor):setSize("parent.w", "parent.h" .. "-" .. headerHeight + filterHeaderHeight + footerHeight + versionFooterHeight):setSpacing(cellSpacing):setJustifyContent("center")--:setOffset(-1, 0)
@@ -168,8 +170,6 @@ local function checkFilter(displayData)
     local show = false
 
     local disconnected = "DISCONNECTED"
-    local input = "Input"
-    local output = "Output"
 
     if displayFilter.showConnected and displayData.data.status ~= disconnected then
         show = true
@@ -179,11 +179,11 @@ local function checkFilter(displayData)
         show = true
     end
 
-    if displayFilter.showInput and _G.parseMeterType(displayData.data.meterType) == input then
+    if displayFilter.showInput and displayData.data.meterType == _G.MeterType.providing then
         show = true
     end
 
-    if displayFilter.showOutput and _G.parseMeterType(displayData.data.meterType) == output then
+    if displayFilter.showOutput and displayData.data.meterType == _G.MeterType.using then
         show = true
     end
 
@@ -205,9 +205,9 @@ local function reloadPage()
     for k,v in pairs(energyMeters) do
 
         -- check display filter in addition to indices
-        -- TODO
+        local matchesFilter = checkFilter(energyMeters[energyMeters[k].id])
 
-        if currIdx >= startIdx and currIdx <= endIdx then
+        if currIdx >= startIdx and currIdx <= endIdx and matchesFilter then
 
             -- calculate relative index on the current page
             local relIdx = currIdx - startIdx + 1
@@ -327,6 +327,32 @@ local function prevPage()
     end
 end
 
+local function toggleFilterShowDisconnected(btn)
+    displayFilter.showDisconnected = not displayFilter.showDisconnected
+    if displayFilter.showDisconnected then
+        btn:setText("Show Disconnected")
+    else
+        btn:setText("Hide Disconnected")
+    end
+    reloadPage()
+end
+
+local function toggleFilterShowSpecificType(type)
+    displayFilter.showInput = false
+    displayFilter.showOutput = false
+
+    if type == "Input" then
+        displayFilter.showInput = true
+    elseif type == "Output" then
+        displayFilter.showOutput = true
+    else
+        displayFilter.showInput = true
+        displayFilter.showOutput = true
+    end
+
+    reloadPage()
+end
+
 local function setupMonitor()
     -- setup header
     energyLbl = header:addLabel():setText("Energy: STORED"):setFontSize(1):setSize("parent.w / 2", 1):setPosition(0, 1):setTextAlign("center")
@@ -334,6 +360,15 @@ local function setupMonitor()
     rateLblIn = header:addLabel():setText("Transfer: IN"):setFontSize(1):setSize("parent.w / 3", 1):setPosition("2 * parent.w / 3", 1):setTextAlign("left")
     rateLblOut = header:addLabel():setText("Transfer: OUT" ):setFontSize(1):setSize("parent.w / 3", 1):setPosition(" 2 * parent.w / 3", 2):setTextAlign("left")
 
+    -- setup filter header
+    local showDisconnectedBtn = filterHeader:addButton():setText("Hide Disconnected"):setSize("parent.w / 4", 1):setBackground(btnDefaultColor):onClick(basalt.schedule(function(self)
+        self:setBackground(btnClickedColor)
+        sleep(btnHighlighDuration)
+        self:setBackground(btnDefaultColor)
+        toggleFilterShowDisconnected(self)
+      end))
+
+    local showTypeRdBtnList = filterHeader:addList():addItem("All"):addItem("Input"):addItem("Output"):onSelect(function(self, event, item) toggleFilterShowSpecificType(item) end)
     
     -- setup footer
     prevBtn = footer:addButton():setText("Prev"):setSize(btnWidth, btnHeight):setPosition(2, math.ceil(footerHeight / 2) + math.floor(btnHeight / 2)):setBackground(btnDefaultColor):onClick(basalt.schedule(function(self)
