@@ -19,6 +19,13 @@ local energyPercentage = 0
 local inputRate = 0
 local outputRate = 0
 
+local displayFilter = {
+    showDisconnected = true,
+    showInput = true,
+    showOutput = true,
+}
+
+-- debugging
 local debugPrint = false
 local debugUI = false
 
@@ -30,8 +37,11 @@ setmetatable(displayCells, {__index = "displayData"})
 -- GUI COMPONENT SETTINGS
 
 -- header settings
-local headerHeight = 5
+local headerHeight = 4
 local headerColor = colors.blue
+local filterHeaderHeight = 3
+local filterHeaderColor = colors.lightBlue
+local filterHeaderBtnSpacing = 2
 
 -- footer settings (including prev/next buttons and page label)
 local footerHeight = 3
@@ -57,6 +67,7 @@ local bgColor = colors.lightGray
 -- if not debug mode, set header and footer color to bgColor
 if not debugUI then
     headerColor = bgColor
+    filterHeaderColor = bgColor
     footerColor = bgColor
 end
 
@@ -77,9 +88,14 @@ local flex = main:addFlexbox():setWrap("wrap"):setBackground(colors.red):setPosi
 
 -- frame that contains the header (energy stored, input/output rates)
 local header = flex:addFrame():setBackground(headerColor):setSize("parent.w", headerHeight)
+local filterHeader = flex:addFlexbox():setWrap("wrap"):setBackground(filterHeaderColor):setSize("parent.w", filterHeaderHeight):setSpacing(filterHeaderBtnSpacing):setJustifyContent("center")
+local filterAllBtn = {}
+local filterInputBtn = {}
+local filterOutputBtn = {}
+local filterBtnGroup = {}
 
 -- flexbox that contains the individual energy meter displays
-local main = flex:addFlexbox():setWrap("wrap"):setBackground(bgColor):setSize("parent.w", "parent.h" .. "-" .. headerHeight + footerHeight + versionFooterHeight):setSpacing(cellSpacing):setJustifyContent("center")--:setOffset(-1, 0)
+local main = flex:addFlexbox():setWrap("wrap"):setBackground(bgColor):setSize("parent.w", "parent.h" .. "-" .. headerHeight + filterHeaderHeight + footerHeight + versionFooterHeight):setSpacing(cellSpacing):setJustifyContent("center")--:setOffset(-1, 0)
 
 -- frame that contains the footer (previous, next, page number)
 local footer = flex:addFrame():setBackground(footerColor):setSize("parent.w", footerHeight)
@@ -109,7 +125,38 @@ local currentPageId = 1
 local totalPageCount = 1
 
 
-local function listen()
+---------------------------
+-- function declarations --
+---------------------------
+local checkFilter
+local reloadPage
+local listen
+local addDisplayCell
+local removeDisplayCell
+local updateEnergyDisplay
+local updateTransferDisplay
+local updateDisplayCells
+local countDisplayableCells
+local updatePageCount
+local updateMonitorValues
+local animateButtonClick
+local animateButtonToggle
+local animateButtonToggleGroup
+local nextPage
+local prevPage
+local toggleFilterShowDisconnected
+local toggleFilterShowSpecificType
+local setupMonitor
+
+--------------------------
+-- function definitions --
+--------------------------
+
+---------------------
+-- Retrieving Data --
+---------------------
+
+listen = function()
     -- Receive data from server
     while true do
         local clock = os.clock()
@@ -137,6 +184,8 @@ local function listen()
             energyPercentage = data.energyPercentage
             inputRate = data.inputRate
             outputRate = data.outputRate
+			
+			reloadPage()
 
             if debugPrint then
                 term.redirect(_G.controlMonitor)
@@ -152,44 +201,63 @@ local function listen()
     end
 end
 
-local function reloadPage()
-    -- iterate over table with displays and hide all except the ones that are on the current page
-    local startIdx = (currentPageId - 1) * totalCellsPerPage + 1
-    local endIdx = currentPageId * totalCellsPerPage
-    local currIdx = 1
 
-    -- remove all cells from the monitor
-    for k,v in pairs(displayedCells) do
-        v:remove()
-    end
 
-    -- add cells to the monitor
-    for k,v in pairs(energyMeters) do
-        if currIdx >= startIdx and currIdx <= endIdx then
+--------------
+-- Setup UI --
+--------------
 
-            -- calculate relative index on the current page
-            local relIdx = currIdx - startIdx + 1
+setupMonitor = function()
+    -- setup header
+    energyLbl = header:addLabel():setText("Energy: STORED"):setFontSize(1):setSize("parent.w / 2", 1):setPosition(0, 1):setTextAlign("center")
+    energyBar = header:addProgressbar():setProgress(0):setSize("parent.w / 3", 1):setPosition("1/12 * parent.w", 3):setProgressBar(colors.lime):setDirection("right"):setBackground(colors.black)
+    rateLblIn = header:addLabel():setText("Transfer: IN"):setFontSize(1):setSize("parent.w / 3", 1):setPosition("2 * parent.w / 3", 1):setTextAlign("left")
+    rateLblOut = header:addLabel():setText("Transfer: OUT" ):setFontSize(1):setSize("parent.w / 3", 1):setPosition(" 2 * parent.w / 3", 2):setTextAlign("left")
 
-            -- create new cell for every idx shown on the current page
-            local frm = main:addFrame():setBackground(cellBackground):setSize(cellWidth, cellHeight)
+    -- setup filter header
+    local showDisconnectedBtn = filterHeader:addButton():setText("Hide Disconnected"):setSize(19, 1):setBackground(btnDefaultColor):onClick(basalt.schedule(function(self)
+        animateButtonClick(self)
+        toggleFilterShowDisconnected(self)
+      end))
 
-            local peripheralId = energyMeters[k].id
-            displayCells[peripheralId] = {
-                clientInfo = energyMeters[peripheralId],
-                displayFrm = frm,
-                dpName = frm:addLabel():setText(energyMeters[peripheralId].name):setFontSize(1):setSize("parent.w-1", 1):setPosition(2, 2):setTextAlign("center"),
-                dpRate = frm:addLabel():setText(_G.numberToEnergyUnit(energyMeters[peripheralId].data.transfer) .. "/t"):setFontSize(1):setSize("parent.w-1", 1):setPosition(2, 3):setTextAlign("center"),
-                dpType = frm:addLabel():setText(_G.parseMeterType(energyMeters[peripheralId].data.meterType)):setFontSize(1):setSize("parent.w-1", 1):setPosition(2, 4):setTextAlign("center"),
-                dpState = frm:addLabel():setText(energyMeters[peripheralId].data.status):setFontSize(1):setSize("parent.w-1", 1):setPosition(2, 5):setTextAlign("center")
-            }
+    --local showTypeRdBtnList = filterHeader:addList():addItem("Show All"):addItem("Show Input"):addItem("Show Output"):onSelect(function(self, event, item) toggleFilterShowSpecificType(item.text) end)
+    filterAllBtn = filterHeader:addButton():setText("Show All"):setSize(10, 1):setBackground(btnDefaultColor)
+    filterInputBtn = filterHeader:addButton():setText("Show Input"):setSize(12, 1):setBackground(btnDefaultColor)
+    filterOutputBtn = filterHeader:addButton():setText("Show Output"):setSize(13, 1):setBackground(btnDefaultColor)
 
-            displayedCells[relIdx] = frm
-        end
-        currIdx = currIdx + 1
-    end
+    filterBtnGroup = {filterAllBtn, filterInputBtn, filterOutputBtn}
+
+    filterAllBtn:onClick(basalt.schedule(function(self)
+        animateButtonToggleGroup(filterBtnGroup, self)
+        toggleFilterShowSpecificType("All")
+      end))
+    filterInputBtn:onClick(basalt.schedule(function(self)
+        animateButtonToggleGroup(filterBtnGroup, self)
+        toggleFilterShowSpecificType("Input")
+      end))
+    filterOutputBtn:onClick(basalt.schedule(function(self)
+        animateButtonToggleGroup(filterBtnGroup, self)
+        toggleFilterShowSpecificType("Output")
+      end))
+
+      -- animate button show all as selected
+      animateButtonToggleGroup(filterBtnGroup, filterAllBtn)
+    
+    -- setup footer
+    prevBtn = footer:addButton():setText("Prev"):setSize(btnWidth, btnHeight):setPosition(2, math.ceil(footerHeight / 2) + math.floor(btnHeight / 2)):setBackground(btnDefaultColor):onClick(basalt.schedule(function(self)
+        animateButtonClick(self)
+      end), prevPage)
+    pageLbl = footer:addLabel():setText("Page: 0/0"):setFontSize(1):setSize(lblWidth,lblHeight):setPosition("(parent.w / 2) - " .. (lblWidth / 2), math.ceil(footerHeight / 2) + math.floor(btnHeight / 2)):setTextAlign("center")
+    nextBtn = footer:addButton():setText("Next"):setSize(btnWidth, btnHeight):setPosition("parent.w-"..btnWidth, math.ceil(footerHeight / 2) + math.floor(btnHeight / 2)):setBackground(btnDefaultColor):onClick(basalt.schedule(function(self)
+        animateButtonClick(self)
+      end), nextPage)
+    versionFooter:addLabel():setText("version: " .. _G.version):setFontSize(1):setSize("parent.w", 1):setPosition(0, versionFooterHeight):setTextAlign("right"):setForeground(colors.gray)
+
+    -- auto update the monitor
+    basalt.autoUpdate()
 end
 
-local function addDisplayCell(peripheralId)
+addDisplayCell = function(peripheralId)
     -- add display cell to the monitor
     if displayCells[peripheralId] == nil then
         -- reload page and update displayed cells
@@ -200,7 +268,7 @@ local function addDisplayCell(peripheralId)
     end
 end
 
-local function removeDisplayCell(peripheralId)
+removeDisplayCell = function(peripheralId)
     -- remove display cell from the monitor
     if displayCells[peripheralId] ~= nil then
         displayCells[peripheralId].displayFrm:remove()
@@ -211,17 +279,23 @@ local function removeDisplayCell(peripheralId)
     end
 end
 
-local function updateEnergyDisplay()
+
+
+----------------------
+-- UPDATE UI VALUES --
+----------------------
+
+updateEnergyDisplay = function()
     energyLbl:setText("Energy: " .. _G.numberToEnergyUnit(storedEnergy) .. "/" .. _G.numberToEnergyUnit(maxEnergy) .. " (" .. _G.formatDecimals(energyPercentage, 1) .. "%)")
     energyBar:setProgress(tonumber(_G.formatDecimals(energyPercentage, 0)))
 end
 
-local function updateTransferDisplay()
+updateTransferDisplay = function()
     rateLblIn:setText("Transfer IN: " .. _G.numberToEnergyUnit(inputRate) .. "/t")
     rateLblOut:setText("Transfer OUT: " .. _G.numberToEnergyUnit(outputRate) .. "/t")
 end
 
-local function updateDisplayCells()
+updateDisplayCells = function()
     for k,v in pairs(displayCells) do
         local i = v.clientInfo
         local d = i.data
@@ -232,19 +306,30 @@ local function updateDisplayCells()
     end
 end
 
-local function updatePageCount()
-    totalPageCount = math.ceil(energyMetersCount / totalCellsPerPage)
+countDisplayableCells = function ()
+    local cnt = 0
+    for k,v in pairs(energyMeters) do
+        if checkFilter(v) then
+            cnt = cnt + 1
+        end
+    end
+    return cnt
+end
+
+updatePageCount = function()
+    --totalPageCount = math.ceil(energyMetersCount / totalCellsPerPage)
+    totalPageCount = math.ceil(countDisplayableCells() / totalCellsPerPage)
     pageLbl:setText("Page: " .. currentPageId .. "/" .. totalPageCount)
 
     -- set currentPageId to last page if last page got deleted
-    if currentPageId > totalPageCount then
+    if currentPageId > totalPageCount or (currentPageId <= 0 and totalPageCount > 0)then
         currentPageId = totalPageCount
-        -- DOES NOT WORK CORRECTLY TODO
+
         reloadPage()
     end
 end
 
-local function updateMonitorValues()
+updateMonitorValues = function()
     while true do
 
         -- iterate over all energy meters and add them to the display
@@ -271,45 +356,148 @@ local function updateMonitorValues()
     end
 end
 
-local function nextPage()
+
+
+-----------------
+-- CHANGE PAGE --
+-----------------
+
+nextPage = function()
     if currentPageId < totalPageCount then
         currentPageId = currentPageId + 1
         reloadPage()
     end
 end
 
-local function prevPage()
+prevPage = function()
     if currentPageId > 1 then
         currentPageId = currentPageId - 1
         reloadPage()
     end
 end
 
-local function setupMonitor()
-    -- setup header
-    energyLbl = header:addLabel():setText("Energy: STORED"):setFontSize(1):setSize("parent.w / 2", 1):setPosition(0, 1):setTextAlign("center")
-    energyBar = header:addProgressbar():setProgress(0):setSize("parent.w / 3", 1):setPosition("1/12 * parent.w", 3):setProgressBar(colors.lime):setDirection("right"):setBackground(colors.black)
-    rateLblIn = header:addLabel():setText("Transfer: IN"):setFontSize(1):setSize("parent.w / 3", 1):setPosition("2 * parent.w / 3", 1):setTextAlign("left")
-    rateLblOut = header:addLabel():setText("Transfer: OUT" ):setFontSize(1):setSize("parent.w / 3", 1):setPosition(" 2 * parent.w / 3", 2):setTextAlign("left")
+reloadPage = function()
+    -- iterate over table with displays and hide all except the ones that are on the current page
+    local startIdx = (currentPageId - 1) * totalCellsPerPage + 1
+    local endIdx = currentPageId * totalCellsPerPage
+    local currIdx = 1
 
-    
-    -- setup footer
-    prevBtn = footer:addButton():setText("Prev"):setSize(btnWidth, btnHeight):setPosition(2, math.ceil(footerHeight / 2) + math.floor(btnHeight / 2)):setBackground(btnDefaultColor):onClick(basalt.schedule(function(self)
-        self:setBackground(btnClickedColor)
-        sleep(btnHighlighDuration)
-        self:setBackground(btnDefaultColor)
-      end), prevPage)
-    pageLbl = footer:addLabel():setText("Page: 0/0"):setFontSize(1):setSize(lblWidth,lblHeight):setPosition("(parent.w / 2) - " .. (lblWidth / 2), math.ceil(footerHeight / 2) + math.floor(btnHeight / 2)):setTextAlign("center")
-    nextBtn = footer:addButton():setText("Next"):setSize(btnWidth, btnHeight):setPosition("parent.w-"..btnWidth, math.ceil(footerHeight / 2) + math.floor(btnHeight / 2)):setBackground(btnDefaultColor):onClick(basalt.schedule(function(self)
-        self:setBackground(btnClickedColor)
-        sleep(btnHighlighDuration)
-        self:setBackground(btnDefaultColor)
-      end), nextPage)
-    versionFooter:addLabel():setText("version: " .. _G.version):setFontSize(1):setSize("parent.w", 1):setPosition(0, versionFooterHeight):setTextAlign("right"):setForeground(colors.gray)
+    -- remove all cells from the monitor
+    for k,v in pairs(displayedCells) do
+        v:remove()
+    end
 
-    -- auto update the monitor
-    basalt.autoUpdate()
+    -- add cells to the monitor
+    for k,v in pairs(energyMeters) do
+
+        -- check display filter in addition to indices
+        local matchesFilter = checkFilter(v)
+
+        if currIdx >= startIdx and currIdx <= endIdx and matchesFilter then
+
+            -- calculate relative index on the current page
+            local relIdx = currIdx - startIdx + 1
+
+            -- create new cell for every idx shown on the current page
+            local frm = main:addFrame():setBackground(cellBackground):setSize(cellWidth, cellHeight)
+
+            local peripheralId = energyMeters[k].id
+            displayCells[peripheralId] = {
+                clientInfo = energyMeters[peripheralId],
+                displayFrm = frm,
+                dpName = frm:addLabel():setText(energyMeters[peripheralId].name):setFontSize(1):setSize("parent.w-1", 1):setPosition(2, 2):setTextAlign("center"),
+                dpRate = frm:addLabel():setText(_G.numberToEnergyUnit(energyMeters[peripheralId].data.transfer) .. "/t"):setFontSize(1):setSize("parent.w-1", 1):setPosition(2, 3):setTextAlign("center"),
+                dpType = frm:addLabel():setText(_G.parseMeterType(energyMeters[peripheralId].data.meterType)):setFontSize(1):setSize("parent.w-1", 1):setPosition(2, 4):setTextAlign("center"),
+                dpState = frm:addLabel():setText(energyMeters[peripheralId].data.status):setFontSize(1):setSize("parent.w-1", 1):setPosition(2, 5):setTextAlign("center")
+            }
+
+            displayedCells[relIdx] = frm
+        end
+        currIdx = currIdx + 1
+    end
+
+    updatePageCount()
 end
+
+
+
+---------------
+-- FILTERING --
+---------------
+
+checkFilter = function(displayData)
+    -- check if the displayData should be shown on the monitor
+    local disconnected = "DISCONNECTED"
+
+    local status = displayData.data.status
+    local meterType = displayData.data.meterType
+
+    local showDisconnected = (displayFilter.showDisconnected and status == disconnected)
+    local showConnected = status ~= disconnected
+    local showInput = (displayFilter.showInput and meterType == _G.MeterType.providing)
+    local showOutput = (displayFilter.showOutput and meterType == _G.MeterType.using)
+
+    local show = (showDisconnected and (showInput or showOutput)) or (showConnected and (showInput or showOutput))
+
+    return show
+end
+
+toggleFilterShowDisconnected = function(btn)
+    displayFilter.showDisconnected = not displayFilter.showDisconnected
+    if not displayFilter.showDisconnected then
+        btn:setText("Show Disconnected")
+    else
+        btn:setText("Hide Disconnected")
+    end
+
+    reloadPage()
+end
+
+toggleFilterShowSpecificType = function(type)
+    displayFilter.showInput = false
+    displayFilter.showOutput = false
+    if type == "Input" then
+        displayFilter.showInput = true
+    elseif type == "Output" then
+        displayFilter.showOutput = true
+    elseif type == "All" then
+        displayFilter.showInput = true
+        displayFilter.showOutput = true
+    end
+
+    reloadPage()
+end
+
+
+
+----------------
+-- ANIMATIONS --
+----------------
+
+animateButtonClick = function(btn)
+    btn:setBackground(btnClickedColor)
+    sleep(btnHighlighDuration)
+    btn:setBackground(btnDefaultColor)
+end
+
+animateButtonToggle = function(btn, state)
+    if state then
+        btn:setBackground(btnClickedColor)
+    else
+        btn:setBackground(btnDefaultColor)
+    end
+end
+
+animateButtonToggleGroup = function(btnGroup, btn)
+    for k,v in pairs(btnGroup) do
+        if v ~= btn then
+            animateButtonToggle(v, false)
+        end
+    end
+    animateButtonToggle(btn, true)
+end
+
+
 
 ---------------------------------------
 -- ACTUAL SERVER PROGRAM STARTS HERE --

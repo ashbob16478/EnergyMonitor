@@ -406,13 +406,22 @@ local function updateMonitorValues()
 
         -- EnergyMeter Display Values
         local meters = energyMeters
-        table.sort(meters, function(a,b) return a.name < b.name end)
+
+        -- sort meters by name
+
+        -- create table with all keys and sort keys
+        local keys = {}
+        for k in pairs(meters) do
+            table.insert(keys, k)
+        end
+        table.sort(keys)
+
         local metersWithIdx = {}
         local idx = 0
         
-        for k, v in pairs(meters) do
+        for k in pairs(keys) do
             idx = idx + 1
-            metersWithIdx[idx] = v
+            metersWithIdx[idx] = meters[keys[k]]
         end
         local meterCount = energyMetersCount
         totalPageCount = math.ceil(meterCount / 4)
