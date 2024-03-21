@@ -156,6 +156,7 @@ local setupMonitor
 local toggleSortDirText
 local toggleSortAttrText
 local sortEnergyMeters
+local toggleFilterShowSpecificTypeText
 
 --------------------------
 -- function definitions --
@@ -226,35 +227,21 @@ setupMonitor = function()
     rateLblOut = header:addLabel():setText("Transfer: OUT" ):setFontSize(1):setSize("parent.w / 3", 1):setPosition(" 2 * parent.w / 3", 2):setTextAlign("left")
 
     -- setup filter header
-    local showDisconnectedBtn = filterHeader:addButton():setText("Hide Disconn."):setSize(15, 1):setBackground(btnDefaultColor):onClick(basalt.schedule(function(self)
+    local showDisconnectedBtn = filterHeader:addButton():setText("Hide Disconnected"):setSize(19, 1):setBackground(btnDefaultColor):onClick(basalt.schedule(function(self)
         animateButtonClick(self)
         toggleFilterShowDisconnected(self)
       end))
 
-    filterAllBtn = filterHeader:addButton():setText("Show All"):setSize(10, 1):setBackground(btnDefaultColor)
-    filterInputBtn = filterHeader:addButton():setText("Show In"):setSize(9, 1):setBackground(btnDefaultColor)
-    filterOutputBtn = filterHeader:addButton():setText("Show Out"):setSize(10, 1):setBackground(btnDefaultColor)
-
-    filterBtnGroup = {filterAllBtn, filterInputBtn, filterOutputBtn}
+    filterAllBtn = filterHeader:addButton():setText("Filter All"):setSize(12, 1):setBackground(btnDefaultColor)
     
     filterAllBtn:onClick(basalt.schedule(function(self)
-        animateButtonToggleGroup(filterBtnGroup, self)
-        toggleFilterShowSpecificType("All")
+        animateButtonClick(self)
+        toggleFilterShowSpecificTypeText(self)
       end))
-    filterInputBtn:onClick(basalt.schedule(function(self)
-        animateButtonToggleGroup(filterBtnGroup, self)
-                toggleFilterShowSpecificType("Input")
-      end))
-    filterOutputBtn:onClick(basalt.schedule(function(self)
-        animateButtonToggleGroup(filterBtnGroup, self)
-                toggleFilterShowSpecificType("Output")
-      end))
-      
-    -- animate button show all as selected
-    animateButtonToggleGroup(filterBtnGroup, filterAllBtn)
+
     
-    sortAttrBtn = filterHeader:addButton():setText("Sort by: Rate"):setSize(15, 1):setBackground(btnDefaultColor)
-    sortOrderBtn = filterHeader:addButton():setText("DESC"):setSize(6, 1):setBackground(btnDefaultColor)
+    sortAttrBtn = filterHeader:addButton():setText("Sort by Name"):setSize(14, 1):setBackground(btnDefaultColor)
+    sortOrderBtn = filterHeader:addButton():setText("Sort Ascending"):setSize(16, 1):setBackground(btnDefaultColor)
 
     sortAttrBtn:onClick(basalt.schedule(function(self)
         animateButtonClick(self)
@@ -473,9 +460,9 @@ end
 toggleFilterShowDisconnected = function(btn)
     displayFilter.showDisconnected = not displayFilter.showDisconnected
     if not displayFilter.showDisconnected then
-        btn:setText("Show Disconn.")
+        btn:setText("Show Disconnected")
     else
-        btn:setText("Hide Disconn.")
+        btn:setText("Hide Disconnected")
     end
 
     reloadPage()
@@ -555,25 +542,42 @@ animateButtonToggleGroup = function(btnGroup, btn)
     animateButtonToggle(btn, true)
 end
 
+toggleFilterShowSpecificTypeText = function(btn)
+    local type = btn:getText()
+    if type == "Filter All" then
+        btn:setText("Filter Input")
+        btn:setSize(14,1)
+        toggleFilterShowSpecificType("Input")
+    elseif type == "Filter Input" then
+        btn:setText("Filter Output")
+        btn:setSize(15,1)
+        toggleFilterShowSpecificType("Output")
+    elseif type == "Filter Output" then
+        btn:setText("Filter All")
+        btn:setSize(14,1)
+        toggleFilterShowSpecificType("All")
+    end
+end
+
 toggleSortAttrText = function(btn)
-    if btn:getText() == "Sort by: Name" then
-        btn:setText("Sort by: Rate")
-        sortingAttr = "name"
-    else
-        btn:setText("Sort by: Name")
+    if btn:getText() == "Sort by Name" then
+        btn:setText("Sort by Rate")
         sortingAttr = "rate"
+    else
+        btn:setText("Sort by Name")
+        sortingAttr = "name"
     end
 end
 
 toggleSortDirText = function(btn)
-    if btn:getText() == "ASC" then
-        btn:setText("DESC")
-		btn:setSize(6,1)
-        sortingDir = "asc"
-    else
-        btn:setText("ASC")
-		btn:setSize(5,1)
+    if btn:getText() == "Sort Ascending" then
+        btn:setText("Sort Descending")
+		btn:setSize(17,1)
         sortingDir = "desc"
+    else
+        btn:setText("Sort Ascending")
+		btn:setSize(16,1)
+        sortingDir = "asc"
     end
 end
 
