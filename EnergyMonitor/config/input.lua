@@ -8,6 +8,31 @@ function _G.formatDecimals(number, decimals)
     return string.format("%." .. decimals .. "f", number)
 end
 
+function _G.EnergyWithUnitToNumber(energy)
+  --extract number and unit separately from string
+  local number = energy:match("%d+%.?%d*")
+  local unit = energy:match("%a+")
+  if unit == "FE" then
+    return tonumber(number)
+  elseif unit == "KFE" then
+    return tonumber(number) * 1000
+  elseif unit == "MFE" then
+    return tonumber(number) * 1000000
+  elseif unit == "GFE" then
+    return tonumber(number) * 1000000000
+  elseif unit == "TFE" then
+    return tonumber(number) * 1000000000000
+  elseif unit == "PFE" then
+    return tonumber(number) * 1000000000000000
+  elseif unit == "EFE" then
+    return tonumber(number) * 1000000000000000000
+  elseif unit == "ZFE" then
+    return tonumber(number) * 1000000000000000000000
+  elseif unit == "YFE" then
+    return tonumber(number) * 1000000000000000000000000
+  end
+end
+
 function _G.numberToEnergyUnit(number)
   -- turn 1000 into 1kFE
   -- turn 1000000 into 1MFE
