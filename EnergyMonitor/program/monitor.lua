@@ -19,6 +19,14 @@ local energyPercentage = 0
 local inputRate = 0
 local outputRate = 0
 
+local displayFilter = {
+    showConnected = true,
+    showDisconnected = true,
+    showInput = true,
+    showOutput = true,
+}
+
+-- debugging
 local debugPrint = false
 local debugUI = false
 
@@ -30,8 +38,10 @@ setmetatable(displayCells, {__index = "displayData"})
 -- GUI COMPONENT SETTINGS
 
 -- header settings
-local headerHeight = 5
+local headerHeight = 4
 local headerColor = colors.blue
+local filterHeaderHeight = 3
+local filterHeaderColor = colors.lightBlue
 
 -- footer settings (including prev/next buttons and page label)
 local footerHeight = 3
@@ -77,9 +87,10 @@ local flex = main:addFlexbox():setWrap("wrap"):setBackground(colors.red):setPosi
 
 -- frame that contains the header (energy stored, input/output rates)
 local header = flex:addFrame():setBackground(headerColor):setSize("parent.w", headerHeight)
+local filterHeader = flex:addFrame():setBackground(filterHeaderColor):setSize("parent.w", filterHeaderHeight)
 
 -- flexbox that contains the individual energy meter displays
-local main = flex:addFlexbox():setWrap("wrap"):setBackground(bgColor):setSize("parent.w", "parent.h" .. "-" .. headerHeight + footerHeight + versionFooterHeight):setSpacing(cellSpacing):setJustifyContent("center")--:setOffset(-1, 0)
+local main = flex:addFlexbox():setWrap("wrap"):setBackground(bgColor):setSize("parent.w", "parent.h" .. "-" .. headerHeight + filterHeaderHeight + footerHeight + versionFooterHeight):setSpacing(cellSpacing):setJustifyContent("center")--:setOffset(-1, 0)
 
 -- frame that contains the footer (previous, next, page number)
 local footer = flex:addFrame():setBackground(footerColor):setSize("parent.w", footerHeight)
@@ -152,6 +163,33 @@ local function listen()
     end
 end
 
+local function checkFilter(displayData)
+    -- check if the displayData should be shown on the monitor
+    local show = false
+
+    local disconnected = "DISCONNECTED"
+    local input = "Input"
+    local output = "Output"
+
+    if displayFilter.showConnected and displayData.data.status ~= disconnected then
+        show = true
+    end
+
+    if displayFilter.showDisconnected and displayData.data.status == disconnected then
+        show = true
+    end
+
+    if displayFilter.showInput and _G.parseMeterType(displayData.data.meterType) == input then
+        show = true
+    end
+
+    if displayFilter.showOutput and _G.parseMeterType(displayData.data.meterType) == output then
+        show = true
+    end
+
+    return show
+end
+
 local function reloadPage()
     -- iterate over table with displays and hide all except the ones that are on the current page
     local startIdx = (currentPageId - 1) * totalCellsPerPage + 1
@@ -165,6 +203,10 @@ local function reloadPage()
 
     -- add cells to the monitor
     for k,v in pairs(energyMeters) do
+
+        -- check display filter in addition to indices
+        -- TODO
+
         if currIdx >= startIdx and currIdx <= endIdx then
 
             -- calculate relative index on the current page
@@ -239,7 +281,7 @@ local function updatePageCount()
     -- set currentPageId to last page if last page got deleted
     if currentPageId > totalPageCount then
         currentPageId = totalPageCount
-        -- DOES NOT WORK CORRECTLY TODO
+
         reloadPage()
     end
 end
