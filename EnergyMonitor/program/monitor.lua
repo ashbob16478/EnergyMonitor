@@ -12,6 +12,7 @@ local displayData = {
 local capacitors = {}
 local capacitorsCount = 0
 local energyMeters = {}
+local sortedEnergyMeters = {}
 local energyMetersCount = 0
 local storedEnergy = 0
 local maxEnergy = 0
@@ -24,6 +25,9 @@ local displayFilter = {
     showInput = true,
     showOutput = true,
 }
+
+local sortingAttr = "name"
+local sortingDir = "asc"
 
 -- debugging
 local debugPrint = false
@@ -93,6 +97,8 @@ local filterAllBtn = {}
 local filterInputBtn = {}
 local filterOutputBtn = {}
 local filterBtnGroup = {}
+local sortAttrBtn = {}
+local sortOrderBtn = {}
 
 -- flexbox that contains the individual energy meter displays
 local main = flex:addFlexbox():setWrap("wrap"):setBackground(bgColor):setSize("parent.w", "parent.h" .. "-" .. headerHeight + filterHeaderHeight + footerHeight + versionFooterHeight):setSpacing(cellSpacing):setJustifyContent("center")--:setOffset(-1, 0)
@@ -147,6 +153,9 @@ local prevPage
 local toggleFilterShowDisconnected
 local toggleFilterShowSpecificType
 local setupMonitor
+local toggleSortDirText
+local toggleSortAttrText
+local sortEnergyMeters
 
 --------------------------
 -- function definitions --
@@ -184,7 +193,8 @@ listen = function()
             energyPercentage = data.energyPercentage
             inputRate = data.inputRate
             outputRate = data.outputRate
-			
+            
+            sortEnergyMeters()
 			reloadPage()
 
             if debugPrint then
@@ -207,6 +217,7 @@ end
 -- Setup UI --
 --------------
 
+
 setupMonitor = function()
     -- setup header
     energyLbl = header:addLabel():setText("Energy: STORED"):setFontSize(1):setSize("parent.w / 2", 1):setPosition(0, 1):setTextAlign("center")
@@ -215,34 +226,47 @@ setupMonitor = function()
     rateLblOut = header:addLabel():setText("Transfer: OUT" ):setFontSize(1):setSize("parent.w / 3", 1):setPosition(" 2 * parent.w / 3", 2):setTextAlign("left")
 
     -- setup filter header
-    local showDisconnectedBtn = filterHeader:addButton():setText("Hide Disconnected"):setSize(19, 1):setBackground(btnDefaultColor):onClick(basalt.schedule(function(self)
+    local showDisconnectedBtn = filterHeader:addButton():setText("Hide Disc."):setSize(12, 1):setBackground(btnDefaultColor):onClick(basalt.schedule(function(self)
         animateButtonClick(self)
         toggleFilterShowDisconnected(self)
       end))
 
-    --local showTypeRdBtnList = filterHeader:addList():addItem("Show All"):addItem("Show Input"):addItem("Show Output"):onSelect(function(self, event, item) toggleFilterShowSpecificType(item.text) end)
     filterAllBtn = filterHeader:addButton():setText("Show All"):setSize(10, 1):setBackground(btnDefaultColor)
-    filterInputBtn = filterHeader:addButton():setText("Show Input"):setSize(12, 1):setBackground(btnDefaultColor)
-    filterOutputBtn = filterHeader:addButton():setText("Show Output"):setSize(13, 1):setBackground(btnDefaultColor)
+    filterInputBtn = filterHeader:addButton():setText("Show In"):setSize(9, 1):setBackground(btnDefaultColor)
+    filterOutputBtn = filterHeader:addButton():setText("Show Out"):setSize(10, 1):setBackground(btnDefaultColor)
 
     filterBtnGroup = {filterAllBtn, filterInputBtn, filterOutputBtn}
-
+    
     filterAllBtn:onClick(basalt.schedule(function(self)
         animateButtonToggleGroup(filterBtnGroup, self)
         toggleFilterShowSpecificType("All")
       end))
     filterInputBtn:onClick(basalt.schedule(function(self)
         animateButtonToggleGroup(filterBtnGroup, self)
-        toggleFilterShowSpecificType("Input")
+                toggleFilterShowSpecificType("Input")
       end))
     filterOutputBtn:onClick(basalt.schedule(function(self)
         animateButtonToggleGroup(filterBtnGroup, self)
-        toggleFilterShowSpecificType("Output")
+                toggleFilterShowSpecificType("Output")
+      end))
+      
+    -- animate button show all as selected
+    animateButtonToggleGroup(filterBtnGroup, filterAllBtn)
+    
+    sortAttrBtn = filterHeader:addButton():setText("Sort by: Rate"):setSize(15, 1):setBackground(btnDefaultColor)
+    sortOrderBtn = filterHeader:addButton():setText("DESC"):setSize(6, 1):setBackground(btnDefaultColor)
+
+    sortAttrBtn:onClick(basalt.schedule(function(self)
+        animateButtonClick(self)
+        toggleSortAttrText(self)
       end))
 
-      -- animate button show all as selected
-      animateButtonToggleGroup(filterBtnGroup, filterAllBtn)
-    
+    sortOrderBtn:onClick(basalt.schedule(function(self)
+        animateButtonClick(self)
+        toggleSortDirText(self)
+      end))
+
+      
     -- setup footer
     prevBtn = footer:addButton():setText("Prev"):setSize(btnWidth, btnHeight):setPosition(2, math.ceil(footerHeight / 2) + math.floor(btnHeight / 2)):setBackground(btnDefaultColor):onClick(basalt.schedule(function(self)
         animateButtonClick(self)
@@ -333,8 +357,8 @@ updateMonitorValues = function()
     while true do
 
         -- iterate over all energy meters and add them to the display
-        for k,v in pairs(energyMeters) do
-            addDisplayCell(k)
+        for k,v in ipairs(sortedEnergyMeters) do
+            addDisplayCell(v.id)
         end
 
         -- remove all energy meters that are not in the received data
@@ -388,7 +412,8 @@ reloadPage = function()
     end
 
     -- add cells to the monitor
-    for k,v in pairs(energyMeters) do
+    for i,v in ipairs(sortedEnergyMeters) do
+        local k = v.id
 
         -- check display filter in addition to indices
         local matchesFilter = checkFilter(v)
@@ -401,19 +426,22 @@ reloadPage = function()
             -- create new cell for every idx shown on the current page
             local frm = main:addFrame():setBackground(cellBackground):setSize(cellWidth, cellHeight)
 
-            local peripheralId = energyMeters[k].id
-            displayCells[peripheralId] = {
-                clientInfo = energyMeters[peripheralId],
+            displayCells[k] = {
+                clientInfo = energyMeters[k],
                 displayFrm = frm,
-                dpName = frm:addLabel():setText(energyMeters[peripheralId].name):setFontSize(1):setSize("parent.w-1", 1):setPosition(2, 2):setTextAlign("center"),
-                dpRate = frm:addLabel():setText(_G.numberToEnergyUnit(energyMeters[peripheralId].data.transfer) .. "/t"):setFontSize(1):setSize("parent.w-1", 1):setPosition(2, 3):setTextAlign("center"),
-                dpType = frm:addLabel():setText(_G.parseMeterType(energyMeters[peripheralId].data.meterType)):setFontSize(1):setSize("parent.w-1", 1):setPosition(2, 4):setTextAlign("center"),
-                dpState = frm:addLabel():setText(energyMeters[peripheralId].data.status):setFontSize(1):setSize("parent.w-1", 1):setPosition(2, 5):setTextAlign("center")
+                dpName = frm:addLabel():setText(energyMeters[k].name):setFontSize(1):setSize("parent.w-1", 1):setPosition(2, 2):setTextAlign("center"),
+                dpRate = frm:addLabel():setText(_G.numberToEnergyUnit(energyMeters[k].data.transfer) .. "/t"):setFontSize(1):setSize("parent.w-1", 1):setPosition(2, 3):setTextAlign("center"),
+                dpType = frm:addLabel():setText(_G.parseMeterType(energyMeters[k].data.meterType)):setFontSize(1):setSize("parent.w-1", 1):setPosition(2, 4):setTextAlign("center"),
+                dpState = frm:addLabel():setText(energyMeters[k].data.status):setFontSize(1):setSize("parent.w-1", 1):setPosition(2, 5):setTextAlign("center")
             }
 
             displayedCells[relIdx] = frm
         end
-        currIdx = currIdx + 1
+
+        if matchesFilter then
+            currIdx = currIdx + 1
+        end
+        
     end
 
     updatePageCount()
@@ -445,9 +473,9 @@ end
 toggleFilterShowDisconnected = function(btn)
     displayFilter.showDisconnected = not displayFilter.showDisconnected
     if not displayFilter.showDisconnected then
-        btn:setText("Show Disconnected")
+        btn:setText("Show Disc.")
     else
-        btn:setText("Hide Disconnected")
+        btn:setText("Hide Disc.")
     end
 
     reloadPage()
@@ -466,6 +494,36 @@ toggleFilterShowSpecificType = function(type)
     end
 
     reloadPage()
+end
+
+
+
+-------------
+-- SORTING --
+-------------
+
+sortEnergyMeters = function()
+	sortedEnergyMeters = {}
+	for k,v in pairs(energyMeters) do table.insert(sortedEnergyMeters, v) end
+
+    if sortingAttr == "name" then
+        table.sort(sortedEnergyMeters, function(v1, v2) return v1.name:upper() < v2.name:upper() end)
+    elseif sortingAttr == "rate" then
+        table.sort(sortedEnergyMeters, function(v1, v2) 
+            local t1, t2
+            if v1.data.transfer == nil then t1 = 0 else t1 = v1.data.transfer end
+            if v2.data.transfer == nil then t2 = 0 else t2 = v2.data.transfer end
+            return t1 < t2
+        end)
+    end
+
+    if sortingDir == "desc" then
+        local reversed = {}
+        for i = #sortedEnergyMeters, 1, -1 do
+            table.insert(reversed, sortedEnergyMeters[i])
+        end
+        sortedEnergyMeters = reversed
+    end
 end
 
 
@@ -495,6 +553,28 @@ animateButtonToggleGroup = function(btnGroup, btn)
         end
     end
     animateButtonToggle(btn, true)
+end
+
+toggleSortAttrText = function(btn)
+    if btn:getText() == "Sort by: Name" then
+        btn:setText("Sort by: Rate")
+        sortingAttr = "name"
+    else
+        btn:setText("Sort by: Name")
+        sortingAttr = "rate"
+    end
+end
+
+toggleSortDirText = function(btn)
+    if btn:getText() == "ASC" then
+        btn:setText("DESC")
+		btn:setSize(6,1)
+        sortingDir = "asc"
+    else
+        btn:setText("ASC")
+		btn:setSize(5,1)
+        sortingDir = "desc"
+    end
 end
 
 
