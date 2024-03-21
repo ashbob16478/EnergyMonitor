@@ -12,6 +12,7 @@ local displayData = {
 local capacitors = {}
 local capacitorsCount = 0
 local energyMeters = {}
+local sortedEnergyMeters = {}
 local energyMetersCount = 0
 local storedEnergy = 0
 local maxEnergy = 0
@@ -24,6 +25,9 @@ local displayFilter = {
     showInput = true,
     showOutput = true,
 }
+
+local sortingAttr = "name"
+local sortingDir = "asc"
 
 -- debugging
 local debugPrint = false
@@ -149,6 +153,9 @@ local prevPage
 local toggleFilterShowDisconnected
 local toggleFilterShowSpecificType
 local setupMonitor
+local toggleSortDirText
+local toggleSortAttrText
+local sortEnergyMeters
 
 --------------------------
 -- function definitions --
@@ -186,7 +193,7 @@ listen = function()
             energyPercentage = data.energyPercentage
             inputRate = data.inputRate
             outputRate = data.outputRate
-			
+
 			reloadPage()
 
             if debugPrint then
@@ -248,7 +255,17 @@ setupMonitor = function()
     sortAttrBtn = filterHeader:addButton():setText("Sort by: Name"):setSize(15, 1):setBackground(btnDefaultColor):setBackground(colors.red)
     sortOrderBtn = filterHeader:addButton():setText("ASC"):setSize(5, 1):setBackground(btnDefaultColor):setBackground(colors.red)
 
+    sortAttrBtn:onClick(basalt.schedule(function(self)
+        animateButtonClick(self)
+        toggleSortAttrText(self)
+      end))
 
+    sortOrderBtn:onClick(basalt.schedule(function(self)
+        animateButtonClick(self)
+        toggleSortDirText(self)
+      end))
+
+      
     -- setup footer
     prevBtn = footer:addButton():setText("Prev"):setSize(btnWidth, btnHeight):setPosition(2, math.ceil(footerHeight / 2) + math.floor(btnHeight / 2)):setBackground(btnDefaultColor):onClick(basalt.schedule(function(self)
         animateButtonClick(self)
@@ -476,6 +493,31 @@ end
 
 
 
+-------------
+-- SORTING --
+-------------
+
+sortEnergyMeters = function()
+	local sortedEnergyMeters = {}
+	for k,v in pairs(energyMeters) do table.insert(sortedEnergyMeters, v) end
+
+    if sortingAttr == "name" then
+        table.sort(sortedEnergyMeters, function(v1, v2) return v1.data.name:upper() < v2.data.name:upper() end)
+    elseif sortAttr == "rate" then
+        table.sort(sortedEnergyMeters, function(v1, v2) return v1.data.transfer < v2.data.transfer end)
+    end
+
+    if sortingDir == "desc" then
+        local reversed = {}
+        for i = #sortedEnergyMeters, 1, -1 do
+            table.insert(reversed, sortedEnergyMeters[i])
+        end
+        sortedEnergyMeters = reversed
+    end
+end
+
+
+
 ----------------
 -- ANIMATIONS --
 ----------------
@@ -501,6 +543,24 @@ animateButtonToggleGroup = function(btnGroup, btn)
         end
     end
     animateButtonToggle(btn, true)
+end
+
+toggleSortAttrText = function(btn)
+    if btn:getText() == "Sort by: Name" then
+        btn:setText("Sort by: Rate")
+    else
+        btn:setText("Sort by: Name")
+    end
+end
+
+toggleSortDirText = function(btn)
+    if btn:getText() == "ASC" then
+        btn:setText("DESC")
+		btn:setSize(6,1)
+    else
+        btn:setText("ASC")
+		btn:setSize(5,1)
+    end
 end
 
 
