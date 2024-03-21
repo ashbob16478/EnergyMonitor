@@ -93,6 +93,8 @@ local filterAllBtn = {}
 local filterInputBtn = {}
 local filterOutputBtn = {}
 local filterBtnGroup = {}
+local sortAttrBtn = {}
+local sortOrderBtn = {}
 
 -- flexbox that contains the individual energy meter displays
 local main = flex:addFlexbox():setWrap("wrap"):setBackground(bgColor):setSize("parent.w", "parent.h" .. "-" .. headerHeight + filterHeaderHeight + footerHeight + versionFooterHeight):setSpacing(cellSpacing):setJustifyContent("center")--:setOffset(-1, 0)
@@ -207,6 +209,7 @@ end
 -- Setup UI --
 --------------
 
+
 setupMonitor = function()
     -- setup header
     energyLbl = header:addLabel():setText("Energy: STORED"):setFontSize(1):setSize("parent.w / 2", 1):setPosition(0, 1):setTextAlign("center")
@@ -215,34 +218,37 @@ setupMonitor = function()
     rateLblOut = header:addLabel():setText("Transfer: OUT" ):setFontSize(1):setSize("parent.w / 3", 1):setPosition(" 2 * parent.w / 3", 2):setTextAlign("left")
 
     -- setup filter header
-    local showDisconnectedBtn = filterHeader:addButton():setText("Hide Disconnected"):setSize(19, 1):setBackground(btnDefaultColor):onClick(basalt.schedule(function(self)
+    local showDisconnectedBtn = filterHeader:addButton():setText("Hide Disc."):setSize(12, 1):setBackground(btnDefaultColor):onClick(basalt.schedule(function(self)
         animateButtonClick(self)
         toggleFilterShowDisconnected(self)
       end))
 
-    --local showTypeRdBtnList = filterHeader:addList():addItem("Show All"):addItem("Show Input"):addItem("Show Output"):onSelect(function(self, event, item) toggleFilterShowSpecificType(item.text) end)
     filterAllBtn = filterHeader:addButton():setText("Show All"):setSize(10, 1):setBackground(btnDefaultColor)
-    filterInputBtn = filterHeader:addButton():setText("Show Input"):setSize(12, 1):setBackground(btnDefaultColor)
-    filterOutputBtn = filterHeader:addButton():setText("Show Output"):setSize(13, 1):setBackground(btnDefaultColor)
+    filterInputBtn = filterHeader:addButton():setText("Show In"):setSize(9, 1):setBackground(btnDefaultColor)
+    filterOutputBtn = filterHeader:addButton():setText("Show Out"):setSize(10, 1):setBackground(btnDefaultColor)
 
     filterBtnGroup = {filterAllBtn, filterInputBtn, filterOutputBtn}
-
+    
     filterAllBtn:onClick(basalt.schedule(function(self)
         animateButtonToggleGroup(filterBtnGroup, self)
         toggleFilterShowSpecificType("All")
       end))
     filterInputBtn:onClick(basalt.schedule(function(self)
         animateButtonToggleGroup(filterBtnGroup, self)
-        toggleFilterShowSpecificType("Input")
+                toggleFilterShowSpecificType("Input")
       end))
     filterOutputBtn:onClick(basalt.schedule(function(self)
         animateButtonToggleGroup(filterBtnGroup, self)
-        toggleFilterShowSpecificType("Output")
+                toggleFilterShowSpecificType("Output")
       end))
-
-      -- animate button show all as selected
-      animateButtonToggleGroup(filterBtnGroup, filterAllBtn)
+      
+    -- animate button show all as selected
+    animateButtonToggleGroup(filterBtnGroup, filterAllBtn)
     
+    sortAttrBtn = filterHeader:addButton():setText("Sort by: Name"):setSize(15, 1):setBackground(btnDefaultColor):setBackground(colors.red)
+    sortOrderBtn = filterHeader:addButton():setText("ASC"):setSize(5, 1):setBackground(btnDefaultColor):setBackground(colors.red)
+
+
     -- setup footer
     prevBtn = footer:addButton():setText("Prev"):setSize(btnWidth, btnHeight):setPosition(2, math.ceil(footerHeight / 2) + math.floor(btnHeight / 2)):setBackground(btnDefaultColor):onClick(basalt.schedule(function(self)
         animateButtonClick(self)
@@ -445,9 +451,9 @@ end
 toggleFilterShowDisconnected = function(btn)
     displayFilter.showDisconnected = not displayFilter.showDisconnected
     if not displayFilter.showDisconnected then
-        btn:setText("Show Disconnected")
+        btn:setText("Show Disc.")
     else
-        btn:setText("Hide Disconnected")
+        btn:setText("Hide Disc.")
     end
 
     reloadPage()
