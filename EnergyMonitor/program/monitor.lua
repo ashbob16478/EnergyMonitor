@@ -226,7 +226,7 @@ setupMonitor = function()
     rateLblOut = header:addLabel():setText("Transfer: OUT" ):setFontSize(1):setSize("parent.w / 3", 1):setPosition(" 2 * parent.w / 3", 2):setTextAlign("left")
 
     -- setup filter header
-    local showDisconnectedBtn = filterHeader:addButton():setText("Hide Disc."):setSize(12, 1):setBackground(btnDefaultColor):onClick(basalt.schedule(function(self)
+    local showDisconnectedBtn = filterHeader:addButton():setText("Hide Disconn."):setSize(15, 1):setBackground(btnDefaultColor):onClick(basalt.schedule(function(self)
         animateButtonClick(self)
         toggleFilterShowDisconnected(self)
       end))
@@ -473,9 +473,9 @@ end
 toggleFilterShowDisconnected = function(btn)
     displayFilter.showDisconnected = not displayFilter.showDisconnected
     if not displayFilter.showDisconnected then
-        btn:setText("Show Disc.")
+        btn:setText("Show Disconn.")
     else
-        btn:setText("Hide Disc.")
+        btn:setText("Hide Disconn.")
     end
 
     reloadPage()
