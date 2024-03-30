@@ -328,8 +328,13 @@ countDisplayableCells = function ()
 end
 
 updatePageCount = function()
-    --totalPageCount = math.ceil(energyMetersCount / totalCellsPerPage)
+    -- calculate pages needed to display all cells
     totalPageCount = math.ceil(countDisplayableCells() / totalCellsPerPage)
+
+    -- total page count always >= 1, even if 0 display cells available
+    totalPageCount = math.max(totalPageCount, 1)
+
+    -- display page status on UI
     pageLbl:setText("Page: " .. currentPageId .. "/" .. totalPageCount)
 
     -- set currentPageId to last page if last page got deleted
