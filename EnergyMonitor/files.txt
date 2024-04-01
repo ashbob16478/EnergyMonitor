@@ -36,7 +36,6 @@
     name = "Program",
     files = {
       "program/client.lua",
-      "program/editOptions.lua",
       "program/monitor.lua",
       "program/server.lua",
       "program/basalt.lua"
@@ -45,7 +44,6 @@
   start = {
     name = "Start",
     files = {
-      "start/menu.lua",
       "start/start.lua"
     }
   }
