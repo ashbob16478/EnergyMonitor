@@ -108,9 +108,9 @@ function _G.ternary ( cond , T , F )
 end
 
 function _G.defaultNil ( val , def )
-  ternary(val == nil, def, val)
+  return ternary(val == nil, def, val)
 end
 
 function _G.defaultNan ( val , def )
-  ternary(val ~= val, def, val)
+  return ternary(val ~= val, def, val)
 end
