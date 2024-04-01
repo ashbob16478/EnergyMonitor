@@ -12,7 +12,6 @@
       "classes/base/EnergyStorage.lua",
       "classes/mekanism/MekanismEnergyStorage.lua",
       "classes/transport/Message.lua",
-      "classes/transport/startup.lua",
       "classes/Language.lua",
       "classes/Peripherals.lua"
     }
@@ -22,7 +21,6 @@
     files = {
       "config/input.lua",
       "config/options.txt",
-      "config/touchpoint.lua"
     }
   },
   lang = {

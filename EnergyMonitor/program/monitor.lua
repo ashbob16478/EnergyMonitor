@@ -30,7 +30,7 @@ local sortingAttr = "name"
 local sortingDir = "asc"
 
 -- debugging
-local debugPrint = false
+local debugPrint = true
 local debugUI = false
 
 -- table contrains energyMeters[i].id as key and the value is the displayData{clientInfo = energyMeters[i], display = already created frame}
@@ -197,17 +197,6 @@ listen = function()
             
             sortEnergyMeters()
 			reloadPage()
-
-            if debugPrint then
-                term.redirect(_G.controlMonitor)
-                term.clear()
-                term.setCursorPos(1,1)
-                print(clock)
-                print("Type: " .. _G.parsePeripheralType(msg.messageData.peripheral)) 
-
-                -- Write to terminal
-            term.redirect(term.native())
-            end
         end
     end
 end

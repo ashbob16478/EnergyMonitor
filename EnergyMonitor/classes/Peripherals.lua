@@ -34,7 +34,6 @@ local function searchPeripherals()
                 _G.amountMonitors = amountMonitors + 1
             else
                 _G.controlMonitor = peri
-                _G.touchpointLocation = periItem
             end
         elseif periType == "modem" then
             if peri.isWireless() then
@@ -78,7 +77,7 @@ function _G.checkPeripherals()
     term.clear()
     term.setCursorPos(1,1)
 
-    if _G.program == "server" or _G.program == "monitor" then
+    if _G.program == "monitor" then
 
         if controlMonitor == "" then
             error("Control Monitor not found!\nPlease check and reboot the computer (Press and hold Ctrl+R)")
@@ -95,10 +94,9 @@ function _G.checkPeripherals()
         local monX,monY = controlMonitor.getSize()
     end
     
-    -- TODO: FIX THIS CHECK LATER ON
-    if _G.program == "client" then
-       -- No monitor required for clients
-    else
+    if _G.program == "client" or _G.program == "server" then
+       -- No monitor required for clients and servers
+    elseif _G.program == "monitor" then
         local monX,monY = controlMonitor.getSize()
         _G.smallMonitor = 0
         if monX < 79 or monY < 24 then
