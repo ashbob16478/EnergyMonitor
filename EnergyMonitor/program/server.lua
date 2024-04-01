@@ -29,7 +29,7 @@ local currentPage = touchpoint.new(_G.touchpointLocation)
 local function totalEnergy()
     local total = 0
     for k, v in pairs(capacitors) do
-        total = total + v.data.energy
+        total = total + _G.defaultNan(v.data.energy, 0)
     end
     return total
 end
@@ -37,13 +37,13 @@ end
 local function totalMaxEnergy()
     local total = 0
     for k, v in pairs(capacitors) do
-        total = total + v.data.maxEnergy
+        total = total + _G.defaultNan(v.data.maxEnergy, 0)
     end
     return total
 end
 
 local function energyPercentage()
-    return totalEnergy() / totalMaxEnergy() * 100
+    return _G.defaultNan(totalEnergy() / totalMaxEnergy(), 0) * 100
 end
 
 local function totalOutputRate()
