@@ -8,21 +8,13 @@
 --All options
 _G.optionList = {}
 _G.version = 0
-_G.backgroundColor = 0
-_G.textColor = 0
-_G.mainMenu = ""
-_G.lang = ""
 _G.program = ""
+_G.lang = ""
 _G.meterType = 0
-_G.debugEnabled = 1
-_G.location = ""
 _G.modemChannel = 0
-_G.wirelessModemLocation = "top"
-_G.language = {}
 _G.autoUpdate = 1
-
---TouchpointLocation (same as the monitor)
-_G.touchpointLocation = {}
+_G.debugEnabled = 1
+_G.language = {}
 
 --========== Global functions for all program parts ==========
 
@@ -49,9 +41,6 @@ function _G.loadOptionFile()
 
 	--Assign values to variables
 	_G.version = optionList["version"]
-	_G.backgroundColor = tonumber(optionList["backgroundColor"])
-	_G.textColor = tonumber(optionList["textColor"])
-	_G.mainMenu = optionList["mainMenu"]
 	_G.program = optionList["program"]
 	_G.meterType = optionList["meterType"]
 	_G.debugEnabled = optionList["debug"]
@@ -65,12 +54,6 @@ function _G.refreshOptionList()
 	debugOutput("Refreshing Option List")
 	debugOutput("Variable: version")
 	optionList["version"] = version
-	debugOutput("Variable: backgroundColor"..backgroundColor)
-	optionList["backgroundColor"] = backgroundColor
-	debugOutput("Variable: textColor = "..textColor)
-	optionList["textColor"] = textColor
-	debugOutput("Variable: mainMenu")
-	optionList["mainMenu"] = mainMenu
 	debugOutput("Variable: program")
 	optionList["program"] = program
 	debugOutput("Variable: meterType")
@@ -325,19 +308,14 @@ _G.initPeripherals()
 debugOutput("Checking for Updates")
 checkUpdates()
 
---Run program or main menu, based on the settings
-if mainMenu then
-	shell.run("/EnergyMonitor/start/menu.lua")
-	shell.completeProgram("/EnergyMonitor/start/start.lua")
-else
-	if program == "server" then
-		shell.run("/EnergyMonitor/program/server.lua")
-	elseif program == "client" then
-		shell.run("/EnergyMonitor/program/client.lua")
-	elseif program == "monitor" then
-		shell.run("/EnergyMonitor/program/monitor.lua")
-	end
-	shell.completeProgram("/EnergyMonitor/start/start.lua")
+--Run program based on the settings
+if program == "server" then
+	shell.run("/EnergyMonitor/program/server.lua")
+elseif program == "client" then
+	shell.run("/EnergyMonitor/program/client.lua")
+elseif program == "monitor" then
+	shell.run("/EnergyMonitor/program/monitor.lua")
 end
+shell.completeProgram("/EnergyMonitor/start/start.lua")
 
 --========== END OF THE START.LUA FILE ==========
