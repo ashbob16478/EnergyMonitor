@@ -287,7 +287,7 @@ end
 
 updateEnergyDisplay = function()
     energyLbl:setText("Energy: " .. _G.numberToEnergyUnit(storedEnergy) .. "/" .. _G.numberToEnergyUnit(maxEnergy) .. " (" .. _G.formatDecimals(energyPercentage, 1) .. "%)")
-    energyBar:setProgress(tonumber(_G.formatDecimals(energyPercentage, 0)))
+    energyBar:setProgress(tonumber(_G.defaultNil(_G.formatDecimals(energyPercentage, 0), 0)))
 end
 
 updateTransferDisplay = function()
