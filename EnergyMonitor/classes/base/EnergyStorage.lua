@@ -10,16 +10,16 @@ local EnergyStorage = {
     type = "",
     
     energy = function(self)
-        return self.id.getEnergyStored()
+        return _G.defaultNil(self.id.getEnergyStored(), 0)
     end,
     capacity = function(self)
-        return self.id.getMaxEnergyStored()
+        return _G.defaultNil(self.id.getMaxEnergyStored(), 0)
     end,
     percentage = function(self)
-        return math.floor(self:energy()/self:capacity()*100)
+        return defaultNan(math.floor(self:energy()/self:capacity()*100), 0)
     end,
     percentagePrecise = function(self)
-        return self:energy()/self:capacity()*100
+        return defaultNan(self:energy()/self:capacity()*100, 0)
     end
 }
 

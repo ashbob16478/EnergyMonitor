@@ -17,28 +17,28 @@ local MekanismEnergyStorage = {
     -- mekanism uses Joule which is 0.4 times RF
     energy = function(self)
         if self.useGetEnergy then
-            return self.id.getEnergy() * 0.4
+            return defaultNil(self.id.getEnergy() * 0.4, 0)
         end
         if self.useGetTotalEnergy then
-            return self.id.getTotalEnergy() * 0.4
+            return defaultNil(self.id.getTotalEnergy() * 0.4, 0)
         end
     end,
     capacity = function(self)
         if self.useGetEnergyCapacity then
-            return self.id.getEnergyCapacity() * 0.4
+            return defaultNil(self.id.getEnergyCapacity() * 0.4, 0)
         end
         if self.useGetMaxEnergy then
-            return self.id.getMaxEnergy() * 0.4
+            return defaultNil(self.id.getMaxEnergy() * 0.4, 0)
         end
         if self.useGetTotalMaxEnergy then
-            return self.id.getTotalMaxEnergy() * 0.4
+            return defaultNil(self.id.getTotalMaxEnergy() * 0.4, 0)
         end
     end,
     percentage = function(self)
-        return math.floor(self:energy()/self:capacity()*100)
+        return defaultNan(math.floor(self:energy()/self:capacity()*100), 0)
     end,
     percentagePrecise = function(self)
-        return self:energy()/self:capacity()*100
+        return defaultNan(self:energy()/self:capacity()*100, 0)
     end
 }
 

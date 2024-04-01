@@ -102,3 +102,15 @@ function format_int(number)
   -- optional minus and fractional part back
   return minus .. int:reverse():gsub("^%p", "") .. fraction
 end
+
+function _G.ternary ( cond , T , F )
+  if cond then return T else return F end
+end
+
+function _G.defaultNil ( val , def )
+  ternary(val == nil, def, val)
+end
+
+function _G.defaultNan ( val , def )
+  ternary(val ~= val, def, val)
+end
