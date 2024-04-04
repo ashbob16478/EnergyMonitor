@@ -111,6 +111,10 @@ function _G.defaultNil ( val , def )
   return ternary(val == nil, def, val)
 end
 
+function _G.defaultInf ( val, def )
+  return ternary(tostring(val) == "inf", def, val)
+end
+
 function _G.defaultNan ( val , def )
   return ternary(val ~= val, def, val)
 end
