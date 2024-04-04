@@ -32,7 +32,7 @@ local function totalMaxEnergy()
 end
 
 local function energyPercentage()
-    return _G.defaultNan(totalEnergy() / totalMaxEnergy(), 0) * 100
+    return _G.defaultNil(_G.defaultNan(totalEnergy() / totalMaxEnergy(), 0), 0) * 100
 end
 
 local function totalOutputRate()
