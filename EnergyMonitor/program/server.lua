@@ -119,7 +119,7 @@ local function ping_clients()
         dropNotRespondingClients()
 
         -- needed since otherwise no yield detected in parallel.waitForAll
-        os.sleep(0.1)
+        os.sleep(_G.pingInterval)
     end
 end
 

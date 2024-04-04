@@ -12,6 +12,7 @@ _G.program = ""
 _G.lang = ""
 _G.meterType = 0
 _G.modemChannel = 0
+_G.pingInterval = 0.5
 _G.autoUpdate = 1
 _G.debugEnabled = 1
 _G.language = {}
@@ -46,6 +47,7 @@ function _G.loadOptionFile()
 	_G.debugEnabled = optionList["debug"]
 	_G.lang = optionList["language"]
 	_G.modemChannel = optionList["modemChannel"]
+	_G.pingInterval = optionList["pingInterval"]
 	_G.autoUpdate = optionList["autoUpdate"]
 end
 
@@ -62,6 +64,8 @@ function _G.refreshOptionList()
 	optionList["language"] = lang
 	debugOutput("Variable: modemChannel")
 	optionList["modemChannel"] = modemChannel
+	debugOutput("Variable: pingInterval")
+	optionList["pingInterval"] = pingInterval
 	optionList["debug"] = debug
 	debugOutput("Variable: autoUpdate")
 	optionList["autoUpdate"] = autoUpdate
