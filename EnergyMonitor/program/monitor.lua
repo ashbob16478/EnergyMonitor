@@ -19,6 +19,7 @@ local maxEnergy = 0
 local energyPercentage = 0
 local inputRate = 0
 local outputRate = 0
+local effectiveRate = 0
 
 local displayFilter = {
     showDisconnected = true,
@@ -194,7 +195,10 @@ listen = function()
             energyPercentage = data.energyPercentage
             inputRate = data.inputRate
             outputRate = data.outputRate
-            
+
+            -- calculate if the energy storage is being charged or discharged
+            effectiveRate = inputRate - outputRate
+			
             sortEnergyMeters()
 			reloadPage()
         end
@@ -293,6 +297,7 @@ end
 updateTransferDisplay = function()
     rateLblIn:setText("Transfer IN: " .. _G.numberToEnergyUnit(inputRate) .. "/t")
     rateLblOut:setText("Transfer OUT: " .. _G.numberToEnergyUnit(outputRate) .. "/t")
+    --TODO: effectiveRateLbl:setText("+/- in color " .. _G.numberToEnergyUnit(effectiveRate) .. "/t")
 end
 
 updateDisplayCells = function()
