@@ -8,6 +8,33 @@ function _G.formatDecimals(number, decimals)
     return string.format("%." .. decimals .. "f", number)
 end
 
+function _G.convertTicksToTime(ticks)
+  local seconds = ticks / 20
+  local minutes = math.floor(seconds / 60)
+  local hours = math.floor(minutes / 60)
+  local days = math.floor(hours / 24)
+  local years = math.floor(days / 365)
+
+  local finalOutput = ""
+  if years > 0 then
+    finalOutput = finalOutput .. years .. "y "
+  end
+  if days > 0 then
+    finalOutput = finalOutput .. days % 365 .. "d "
+  end
+  if hours > 0 then
+    finalOutput = finalOutput .. hours % 24 .. "h "
+  end
+  if minutes > 0 then
+    finalOutput = finalOutput .. minutes % 60 .. "m "
+  end
+  if seconds > 0 then
+    finalOutput = finalOutput .. seconds % 60 .. "s"
+  end
+
+  return finalOutput
+end
+
 function _G.EnergyWithUnitToNumber(energy)
   --extract number and unit separately from string
   local number = energy:match("%d+%.?%d*")

@@ -125,6 +125,7 @@ local energyBar = {}
 local rateLblIn = {}
 local rateLblOut = {}
 local effectiveRateLbl = {}
+local etaLbl = {}
 
 -- GUI COMPONENTS END
 
@@ -219,7 +220,8 @@ setupMonitor = function()
     energyBar = header:addProgressbar():setProgress(0):setSize("parent.w / 3", 1):setPosition("1/12 * parent.w", 3):setProgressBar(colors.lime):setDirection("right"):setBackground(colors.black)
     rateLblIn = header:addLabel():setText("Transfer: IN"):setFontSize(1):setSize("parent.w / 3", 1):setPosition("2 * parent.w / 3", 1):setTextAlign("left")
     rateLblOut = header:addLabel():setText("Transfer: OUT" ):setFontSize(1):setSize("parent.w / 3", 1):setPosition(" 2 * parent.w / 3", 2):setTextAlign("left")
-    effectiveRateLbl = header:addLabel():setText("Effective Rate: "):setFontSize(1):setSize("parent.w / 3", 1):setPosition("2 * parent.w / 3", 3):setTextAlign("left")
+    effectiveRateLbl = header:addLabel():setText("Eff. Rate: "):setFontSize(1):setSize("parent.w / 3", 1):setPosition("2 * parent.w / 3", 3):setTextAlign("left")
+    etaLbl = header:addLabel():setText("ETA: "):setFontSize(1):setSize("parent.w / 3", 1):setPosition("2 * parent.w / 3", 4):setTextAlign("left")
 
     -- setup filter header
     local showDisconnectedBtn = filterHeader:addButton():setText("Hide Disconnected"):setSize(19, 1):setBackground(btnDefaultColor):onClick(basalt.schedule(function(self)
@@ -304,12 +306,31 @@ updateTransferDisplay = function()
     local effectiveRateColor = {}
     if effectiveRate <= 0 then
         effectiveRateColor = colors.red
-        effectiveRateLbl:setText("Effective Rate: -" .. _G.numberToEnergyUnit(effectiveRate * -1) .. "/t")
+        effectiveRateLbl:setText("Eff. Rate: -" .. _G.numberToEnergyUnit(effectiveRate * -1) .. "/t")
     else
         effectiveRateColor = colors.lime
-        effectiveRateLbl:setText("Effective Rate: +" .. _G.numberToEnergyUnit(effectiveRate) .. "/t")
+        effectiveRateLbl:setText("Eff. Rate: +" .. _G.numberToEnergyUnit(effectiveRate) .. "/t")
     end
     effectiveRateLbl:setForeground(effectiveRateColor)
+
+
+
+    -- calculate estimated time until full/empty
+    local eta = 0
+    
+    if effectiveRate < 0 then
+        -- time until empty
+        eta = storedEnergy / effectiveRate
+        etaLbl:setText("ETA: " .. _G.convertTicksToTime(eta))
+    elseif effectiveRate > 0 then
+        -- time until full
+        eta = (maxEnergy - storedEnergy) / effectiveRate
+        etaLbl:setText("ETA: " .. _G.convertTicksToTime(eta))
+    else
+        -- time should be "inf"
+        eta = -1
+        etaLbl:setText("ETA: inf")
+    end
 end
 
 updateDisplayCells = function()
