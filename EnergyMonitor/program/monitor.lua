@@ -124,6 +124,7 @@ local energyBar = {}
 
 local rateLblIn = {}
 local rateLblOut = {}
+local effectiveRateLbl = {}
 
 -- GUI COMPONENTS END
 
@@ -218,6 +219,7 @@ setupMonitor = function()
     energyBar = header:addProgressbar():setProgress(0):setSize("parent.w / 3", 1):setPosition("1/12 * parent.w", 3):setProgressBar(colors.lime):setDirection("right"):setBackground(colors.black)
     rateLblIn = header:addLabel():setText("Transfer: IN"):setFontSize(1):setSize("parent.w / 3", 1):setPosition("2 * parent.w / 3", 1):setTextAlign("left")
     rateLblOut = header:addLabel():setText("Transfer: OUT" ):setFontSize(1):setSize("parent.w / 3", 1):setPosition(" 2 * parent.w / 3", 2):setTextAlign("left")
+    effectiveRateLbl = header:addLabel():setText("Effective Rate: "):setFontSize(1):setSize("parent.w / 3", 1):setPosition("2 * parent.w / 3", 3):setTextAlign("left")
 
     -- setup filter header
     local showDisconnectedBtn = filterHeader:addButton():setText("Hide Disconnected"):setSize(19, 1):setBackground(btnDefaultColor):onClick(basalt.schedule(function(self)
@@ -297,7 +299,17 @@ end
 updateTransferDisplay = function()
     rateLblIn:setText("Transfer IN: " .. _G.numberToEnergyUnit(inputRate) .. "/t")
     rateLblOut:setText("Transfer OUT: " .. _G.numberToEnergyUnit(outputRate) .. "/t")
-    --TODO: effectiveRateLbl:setText("+/- in color " .. _G.numberToEnergyUnit(effectiveRate) .. "/t")
+
+    -- adjust effective rate (green for positive/red for negative)
+    local effectiveRateColor = {}
+    if effectiveRate <= 0 then
+        effectiveRateColor = colors.red
+        effectiveRateLbl:setText("- " .. _G.numberToEnergyUnit(effectiveRate * -1) .. "/t")
+    else
+        effectiveRateColor = colors.lime
+        effectiveRateLbl:setText("+ " .. _G.numberToEnergyUnit(effectiveRate) .. "/t")
+    end
+    effectiveRateLbl:setForeground(effectiveRateColor)
 end
 
 updateDisplayCells = function()
