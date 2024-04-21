@@ -42,9 +42,9 @@ setmetatable(displayCells, {__index = "displayData"})
 -- GUI COMPONENT SETTINGS
 
 -- header settings
-local headerHeight = 4
+local headerHeight = 5
 local headerColor = colors.blue
-local filterHeaderHeight = 3
+local filterHeaderHeight = 2
 local filterHeaderColor = colors.lightBlue
 local filterHeaderBtnSpacing = 2
 
