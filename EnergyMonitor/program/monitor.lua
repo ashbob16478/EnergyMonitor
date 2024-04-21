@@ -304,10 +304,10 @@ updateTransferDisplay = function()
     local effectiveRateColor = {}
     if effectiveRate <= 0 then
         effectiveRateColor = colors.red
-        effectiveRateLbl:setText("- " .. _G.numberToEnergyUnit(effectiveRate * -1) .. "/t")
+        effectiveRateLbl:setText("Effective Rate: -" .. _G.numberToEnergyUnit(effectiveRate * -1) .. "/t")
     else
         effectiveRateColor = colors.lime
-        effectiveRateLbl:setText("+ " .. _G.numberToEnergyUnit(effectiveRate) .. "/t")
+        effectiveRateLbl:setText("Effective Rate: +" .. _G.numberToEnergyUnit(effectiveRate) .. "/t")
     end
     effectiveRateLbl:setForeground(effectiveRateColor)
 end
