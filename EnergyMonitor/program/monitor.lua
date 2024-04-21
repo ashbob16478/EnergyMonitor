@@ -321,7 +321,7 @@ updateTransferDisplay = function()
     if effectiveRate < 0 then
         -- time until empty
         eta = storedEnergy / effectiveRate
-        etaLbl:setText("ETA: " .. _G.convertTicksToTime(eta))
+        etaLbl:setText("ETA: " .. _G.convertTicksToTime(-eta))
     elseif effectiveRate > 0 then
         -- time until full
         eta = (maxEnergy - storedEnergy) / effectiveRate
