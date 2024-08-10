@@ -54,8 +54,10 @@ local function searchPeripherals()
                 or string.find(periType, "rftoolspower:cell")
                 or string.find(periType, "Energy Cube")
                 or string.find(periType, "EnergyCube")
+			
+			local isDraconicEvolution = periType == "draconicevolution:energy_pylon"
 
-            local isBase = (not isMekanism and not isThermalExpansion) and successGetEnergyStored
+            local isBase = (not isMekanism and not isThermalExpansion and not isDraconicEvolution) and successGetEnergyStored
 
             if isBase then
                 --Capacitorbank / Energycell / Energy Core
@@ -67,6 +69,12 @@ local function searchPeripherals()
                 --Mekanism V10plus 
                 print("Mekanism Energy Storage device - "..peripheralList[i])
                 _G.capacitor = newMekanismEnergyStorage("ec0", peri, periItem, periType)
+            end
+			
+			if isDraconicEvolution then
+                --Draconic energy core
+                print("DraconicEvolution Energy Storage device - "..peripheralList[i])
+                _G.capacitor = newDraconicEnergyStorage("ec0", peri, periItem, periType)
             end
         end
     end
