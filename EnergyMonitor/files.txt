@@ -11,6 +11,7 @@
       "classes/base/EnergyMeter.lua",
       "classes/base/EnergyStorage.lua",
       "classes/mekanism/MekanismEnergyStorage.lua",
+	    "classes/draconicEvolution/DraconicEnergyStorage.lua",
       "classes/transport/Message.lua",
       "classes/Language.lua",
       "classes/Peripherals.lua"
