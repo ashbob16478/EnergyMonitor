@@ -8,29 +8,17 @@ local DraconicEnergyStorage = {
     id = {},
     side = "",
     type = "",
-    useGetEnergy = false,    
-    useGetTotalEnergy = false,    
-    useGetEnergyCapacity = false,    
-    useGetMaxEnergy = false,    
-    useGetTotalMaxEnergy = false,
+    useGetEnergy = false,
+    useGetEnergyCapacity = false,
 
     energy = function(self)
         if self.useGetEnergy then
-            return defaultNil(self.id.getEnergy(), 0)
-        end
-        if self.useGetTotalEnergy then
-            return defaultNil(self.id.getTotalEnergy(), 0)
+            return defaultNil(self.id.getEnergyStored(), 0)
         end
     end,
     capacity = function(self)
         if self.useGetEnergyCapacity then
-            return defaultNil(self.id.getEnergyCapacity(), 0)
-        end
-        if self.useGetMaxEnergy then
-            return defaultNil(self.id.getMaxEnergy(), 0)
-        end
-        if self.useGetTotalMaxEnergy then
-            return defaultNil(self.id.getTotalMaxEnergy(), 0)
+            return defaultNil(self.id.getMaxEnergyStored(), 0)
         end
     end,
     percentage = function(self)
@@ -50,17 +38,11 @@ function _G.newDraconicEnergyStorage(name,id, side, type)
         print("MISSING wrapped peripheral object. This is going to break!")
     end
 
-    local successGetEnergy, errGetEnergy= pcall(function() id.getEnergy() end)
-    local successGetTotalEnergy, errGetTotalEnergy= pcall(function() id.getTotalEnergy() end)
-    local successGetEnergyCapacity, errGetEnergyCapacity= pcall(function() id.getEnergyCapacity() end)
-    local successGetMaxEnergy, errGetMaxEnergy= pcall(function() id.getMaxEnergy() end)
-    local successGetTotalMaxEnergy, errGetTotalMaxEnergy= pcall(function() id.getTotalMaxEnergy() end)
+    local successGetEnergy, errGetEnergy= pcall(function() id.getEnergyStored() end)
+    local successGetEnergyCapacity, errGetEnergyCapacity= pcall(function() id.getMaxEnergyStored() end)
 
     storage.useGetEnergy = successGetEnergy
-    storage.useGetTotalEnergy = successGetTotalEnergy   
-    storage.useGetEnergyCapacity = successGetEnergyCapacity    
-    storage.useGetMaxEnergy = successGetMaxEnergy    
-    storage.useGetTotalMaxEnergy = successGetTotalMaxEnergy
+    storage.useGetEnergyCapacity = successGetEnergyCapacity
 
     storage.name = name
     storage.id = id
@@ -69,7 +51,5 @@ function _G.newDraconicEnergyStorage(name,id, side, type)
 
     return storage
 end
-
-
 
 

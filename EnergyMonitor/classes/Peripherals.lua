@@ -55,7 +55,7 @@ local function searchPeripherals()
                 or string.find(periType, "Energy Cube")
                 or string.find(periType, "EnergyCube")
 			
-			local isDraconicEvolution = periType == "draconicevolution:energy_pylon"
+			local isDraconicEvolution = periType == "draconic_rf_storage"
 
             local isBase = (not isMekanism and not isThermalExpansion and not isDraconicEvolution) and successGetEnergyStored
 
