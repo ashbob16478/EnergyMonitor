@@ -3,6 +3,7 @@ _G.MessageType = {
     Handshake = 1,     --Sent as a handshake to establish a connection from client to server
     Update = 2,        --Sent to update values to the server from the client
     Monitor = 3,       --Sent to the monitor to update the monitor
+    Control = 4,       --Sent to the client to control its behaviour
  }
 
  _G.Sender = {
@@ -16,6 +17,7 @@ _G.MeterType = {
     using = 1
 }
 
+--Data structure to use in MessageData.data
 _G.MeterData = {
     name = "",
     id = "",
@@ -25,6 +27,7 @@ _G.MeterData = {
     meterType = ""
 }
 
+--Data structure to use in MessageData.data
 _G.CapacitorData = {
     name = "",
     id = "",
@@ -33,6 +36,7 @@ _G.CapacitorData = {
     status = "",
 }
 
+--Data structure to use in MessageData.data
 _G.MonitorData = {
     capacitors = {},
     capacitorsCount = -1,
@@ -45,11 +49,18 @@ _G.MonitorData = {
     outputRate = -1,
 }
 
+--Data structure to use in MessageData.data
+_G.ControlData = {
+    peripheral = {},
+}
+
+--peripheral used in MessageData.data
 _G.MessageDataPeripheral = {
     Capacitor = 0,
     EnergyMeter = 1,
 }
 
+--data to use in Message.messageData
 _G.MessageData = {
     peripheral = {},
     data = {}
@@ -156,6 +167,8 @@ function _G.parseSender(sender)
         return "Server"
     elseif sender == Sender.Client then
         return "Client"
+    elseif sender == Sender.Monitor then
+        return "Monitor"
     else
         return "Unknown"
     end
@@ -168,6 +181,8 @@ function _G.parseType(type)
         return "Update"
     elseif type == MessageType.Ping then
         return "Ping"
+    elseif type == MessageType.Control then
+        return "Control"
     else
         return "Unknown"
     end
