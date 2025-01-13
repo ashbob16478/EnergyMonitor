@@ -12,19 +12,20 @@ _G.MessageType = {
     Monitor = 2
  }
 
-_G.MeterType = {
-    providing = 0,
-    using = 1
+_G.TransferType = {
+    Input = "input",
+    Output = "output",
+    Both = "both",
 }
 
 --Data structure to use in MessageData.data
-_G.MeterData = {
+_G.TransferData = {
     name = "",
     id = "",
-    transfer = -1,
-    mode = "",
+    transferIn = 0,
+    transferOut = 0,
     status = "",
-    meterType = ""
+    transferType = ""
 }
 
 --Data structure to use in MessageData.data
@@ -40,8 +41,8 @@ _G.CapacitorData = {
 _G.MonitorData = {
     capacitors = {},
     capacitorsCount = -1,
-    energyMeters = {},
-    energyMetersCount = -1,
+    transferrers = {},
+    transferrersCount = -1,
     storedEnergy = -1,
     maxEnergy = -1,
     energyPercentage = -1,
@@ -57,7 +58,7 @@ _G.ControlData = {
 --peripheral used in MessageData.data
 _G.MessageDataPeripheral = {
     Capacitor = 0,
-    EnergyMeter = 1,
+    Transfer = 1,
 }
 
 --data to use in Message.messageData
@@ -192,17 +193,19 @@ function _G.parsePeripheralType(type)
     if type == MessageDataPeripheral.Capacitor then
         return "Capacitor"
     elseif type == MessageDataPeripheral.EnergyMeter then
-        return "EnergyMeter"
+        return "Transferrer"
     else
         return "Unknown"
     end
 end
 
-function _G.parseMeterType(type)
-    if type == MeterType.providing then
+function _G.parseTransferType(type)
+    if type == TransferType.Input then
         return "Input"
-    elseif type == MeterType.using then
+    elseif type == TransferType.Output then
         return "Output"
+    elseif type == TransferType.Both then
+        return "Input/Output"
     else
         return "Unknown"
     end

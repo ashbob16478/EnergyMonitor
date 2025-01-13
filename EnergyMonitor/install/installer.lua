@@ -257,15 +257,22 @@ if not update then
 
       term.clear()
       term.setCursorPos(1,1)
-      print(selectedLang:getText("installerClientMeterOrStorage"))
+      print(selectedLang:getText("installerClientTransferrerOrStorage"))
       local clientType = read()
       term.write("Input: ")
-      if clientType == "m" then
+      if clientType == "t" then
 
         term.clear()
         term.setCursorPos(1,1)
-        print(selectedLang:getText("installerClientMeterType"))
-        meterType = tonumber(read())
+        print(selectedLang:getText("installerClientTransferrerType"))
+        transferTypeNumber = tonumber(read())
+        if transferTypeNumber == 0 then
+          meterType = "input"
+        elseif transferTypeNumber == 1 then
+          meterType = "output"
+        else
+          meterType = "both"
+        end
 
       elseif clientType == "s" then
 

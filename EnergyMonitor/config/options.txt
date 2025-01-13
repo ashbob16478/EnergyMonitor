@@ -1,8 +1,9 @@
 {
-  version = "1.6.6.8-release",
+  version = "1.7-release",
   program = "server",
   language = "en",
-  meterType = 1,
+  peripheralType = "transfer",
+  transferType = "both",
   modemChannel = 5,
   pingInterval = 0.5,
   autoUpdate = 1,

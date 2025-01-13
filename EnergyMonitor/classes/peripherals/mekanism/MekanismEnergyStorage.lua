@@ -3,11 +3,7 @@
 -- Version 2.0
 -- https://gitlab.com/seekerscomputercraft/extremereactorcontrol/-/blob/main/classes/mekanism/MekanismEnergyStorage.lua?ref_type=heads
 
-local MekanismEnergyStorage = {
-    name = "",
-    id = {},
-    side = "",
-    type = "",
+local MekanismEnergyStorage = setmetatable({
     useGetEnergy = false,    
     useGetTotalEnergy = false,    
     useGetEnergyCapacity = false,    
@@ -40,10 +36,10 @@ local MekanismEnergyStorage = {
     percentagePrecise = function(self)
         return defaultNan(self:energy()/self:capacity()*100, 0)
     end
-}
+}, {__index = EnergyStorage})
 
 function _G.newMekanismEnergyStorage(name,id, side, type)
-    print("Creating new Mekanism EnergyCube Storage")
+    print("Creating new Mekanism Energy Storage")
     local storage = {}
     setmetatable(storage,{__index=MekanismEnergyStorage})
     

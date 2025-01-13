@@ -3,11 +3,7 @@
 -- Version 2.0
 -- https://gitlab.com/seekerscomputercraft/extremereactorcontrol/-/blob/main/classes/mekanism/MekanismEnergyStorage.lua?ref_type=heads
 
-local DraconicEnergyStorage = {
-    name = "",
-    id = {},
-    side = "",
-    type = "",
+local DraconicEnergyStorage = setmetatable({
     useGetEnergy = false,
     useGetEnergyCapacity = false,
 
@@ -27,7 +23,7 @@ local DraconicEnergyStorage = {
     percentagePrecise = function(self)
         return defaultNan(self:energy()/self:capacity()*100, 0)
     end
-}
+}, {__index = EnergyStorage})
 
 function _G.newDraconicEnergyStorage(name,id, side, type)
     print("Creating new DraconicEvolution Energy Storage")

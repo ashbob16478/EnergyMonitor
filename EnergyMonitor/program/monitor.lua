@@ -4,16 +4,17 @@ local displayData = {
     clientInfo = {},
     displayFrm = {},
     dpName = "",
-    dpRate = "",
+    dpRateIn = "",
+    dpRateOut = "",
     dpType = "",
     dpState = ""
 }
 
 local capacitors = {}
 local capacitorsCount = 0
-local energyMeters = {}
-local sortedEnergyMeters = {}
-local energyMetersCount = 0
+local transferrers = {}
+local sortedTransferrers = {}
+local transferrersCount = 0
 local storedEnergy = 0
 local maxEnergy = 0
 local energyPercentage = 0
@@ -158,7 +159,7 @@ local toggleFilterShowSpecificType
 local setupMonitor
 local toggleSortDirText
 local toggleSortAttrText
-local sortEnergyMeters
+local sortTransferrers
 local toggleFilterShowSpecificTypeText
 
 --------------------------
@@ -190,8 +191,8 @@ listen = function()
 
             capacitors = data.capacitors
             capacitorsCount = data.capacitorsCount
-            energyMeters = data.energyMeters
-            energyMetersCount = data.energyMetersCount
+            transferrers = data.transferrers
+            transferrersCount = data.transferrersCount
             storedEnergy = data.storedEnergy
             maxEnergy = data.maxEnergy
             energyPercentage = data.energyPercentage
@@ -201,7 +202,7 @@ listen = function()
             -- calculate if the energy storage is being charged or discharged
             effectiveRate = inputRate - outputRate
 			
-            sortEnergyMeters()
+            sortTransferrers()
 			reloadPage()
         end
     end
@@ -272,7 +273,7 @@ addDisplayCell = function(peripheralId)
         reloadPage()
     else
         -- update values stored in table
-        displayCells[peripheralId].clientInfo = energyMeters[peripheralId]
+        displayCells[peripheralId].clientInfo = transferrers[peripheralId]
     end
 end
 
@@ -304,11 +305,14 @@ updateTransferDisplay = function()
 
     -- adjust effective rate (green for positive/red for negative)
     local effectiveRateColor = {}
-    if effectiveRate <= 0 then
+    if effectiveRate < 0 then
         effectiveRateColor = colors.red
         effectiveRateLbl:setText("Eff. Rate: -" .. _G.numberToEnergyUnit(effectiveRate * -1) .. "/t")
-    else
+    elseif effectiveRate > 0 then
         effectiveRateColor = colors.lime
+        effectiveRateLbl:setText("Eff. Rate: +" .. _G.numberToEnergyUnit(effectiveRate) .. "/t")
+    else
+        effectiveRateColor = colors.yellow
         effectiveRateLbl:setText("Eff. Rate: +" .. _G.numberToEnergyUnit(effectiveRate) .. "/t")
     end
     effectiveRateLbl:setForeground(effectiveRateColor)
@@ -338,15 +342,21 @@ updateDisplayCells = function()
         local i = v.clientInfo
         local d = i.data
         displayCells[k].dpName:setText(d.name)
-        displayCells[k].dpRate:setText(_G.numberToEnergyUnit(d.transfer) .. "/t")
-        displayCells[k].dpType:setText(_G.parseMeterType(d.meterType))
-        displayCells[k].dpState:setText(d.status)
+
+        if displayCells[k].dpRateIn then
+            displayCells[k].dpRateIn:setText(_G.numberToEnergyUnit(d.transferIn) .. "/t")
+        end
+        if displayCells[k].dpRateOut then
+            displayCells[k].dpRateOut:setText(_G.numberToEnergyUnit(d.transferOut) .. "/t")
+        end
+        --displayCells[k].dpType:setText(_G.parseTransferType(d.transferType))
+        --displayCells[k].dpState:setText(d.status)
     end
 end
 
 countDisplayableCells = function ()
     local cnt = 0
-    for k,v in pairs(energyMeters) do
+    for k,v in pairs(transferrers) do
         if checkFilter(v) then
             cnt = cnt + 1
         end
@@ -376,13 +386,13 @@ updateMonitorValues = function()
     while true do
 
         -- iterate over all energy meters and add them to the display
-        for k,v in ipairs(sortedEnergyMeters) do
+        for k,v in ipairs(sortedTransferrers) do
             addDisplayCell(v.id)
         end
 
         -- remove all energy meters that are not in the received data
         for k,v in pairs(displayCells) do
-            if energyMeters[k] == nil then
+            if transferrers[k] == nil then
                 removeDisplayCell(k)
             end
         end
@@ -391,7 +401,7 @@ updateMonitorValues = function()
         updateTransferDisplay()
         updateDisplayCells()
         
-        if energyMetersCount > 0 then
+        if transferrersCount > 0 then
             updatePageCount()
         end
 
@@ -431,7 +441,7 @@ reloadPage = function()
     end
 
     -- add cells to the monitor
-    for i,v in ipairs(sortedEnergyMeters) do
+    for i,v in ipairs(sortedTransferrers) do
         local k = v.id
 
         -- check display filter in addition to indices
@@ -446,12 +456,41 @@ reloadPage = function()
             local frm = main:addFrame():setBackground(cellBackground):setSize(cellWidth, cellHeight)
 
             displayCells[k] = {
-                clientInfo = energyMeters[k],
+                clientInfo = transferrers[k],
                 displayFrm = frm,
-                dpName = frm:addLabel():setText(energyMeters[k].name):setFontSize(1):setSize("parent.w-1", 1):setPosition(2, 2):setTextAlign("center"),
-                dpRate = frm:addLabel():setText(_G.numberToEnergyUnit(energyMeters[k].data.transfer) .. "/t"):setFontSize(1):setSize("parent.w-1", 1):setPosition(2, 3):setTextAlign("center"),
-                dpType = frm:addLabel():setText(_G.parseMeterType(energyMeters[k].data.meterType)):setFontSize(1):setSize("parent.w-1", 1):setPosition(2, 4):setTextAlign("center"),
-                dpState = frm:addLabel():setText(energyMeters[k].data.status):setFontSize(1):setSize("parent.w-1", 1):setPosition(2, 5):setTextAlign("center")
+                dpName = frm:addLabel()
+                    :setText(transferrers[k].name)
+                    :setFontSize(1)
+                    :setSize("parent.w-1", 1)
+                    :setPosition(2, 2)
+                    :setTextAlign("center"),
+                
+                dpType = frm:addLabel()
+                    :setText(_G.parseTransferType(transferrers[k].data.transferType))
+                    :setFontSize(1)
+                    :setSize("parent.w-1", 1)
+                    :setPosition(2, 3)
+                    :setTextAlign("center"),
+
+                -- Conditionally display input rate on line 4 if InputType is "Input" or "Both"
+                dpRateIn = (transferrers[k].data.transferType == _G.TransferType.Input or transferrers[k].data.transferType == _G.TransferType.Both) and 
+                frm:addLabel()
+                    :setText(_G.numberToEnergyUnit(transferrers[k].data.transferIn) .. "/t")
+                    :setFontSize(1)
+                    :setSize("parent.w-1", 1)
+                    :setPosition(2, 4)  -- Position on line 4
+                    :setTextAlign("center") or nil,
+
+            -- Conditionally display output rate on line 4 if InputType is "Output"
+                dpRateOut = (transferrers[k].data.transferType == _G.TransferType.Output or transferrers[k].data.transferType == _G.TransferType.Both) and 
+                frm:addLabel()
+                    :setText(_G.numberToEnergyUnit(transferrers[k].data.transferOut) .. "/t")
+                    :setFontSize(1)
+                    :setSize("parent.w-1", 1)
+                    :setPosition(2, transferrers[k].data.transferType == _G.TransferType.Both and 5 or 4)  -- Position on line 5 if Both
+                    :setTextAlign("center") or nil,
+
+                --dpState = frm:addLabel():setText(transferrers[k].data.status):setFontSize(1):setSize("parent.w-1", 1):setPosition(2, 6):setTextAlign("center")
             }
 
             displayedCells[relIdx] = frm
@@ -477,12 +516,12 @@ checkFilter = function(displayData)
     local disconnected = "DISCONNECTED"
 
     local status = displayData.data.status
-    local meterType = displayData.data.meterType
+    local transferType = displayData.data.transferType
 
     local showDisconnected = (displayFilter.showDisconnected and status == disconnected)
     local showConnected = status ~= disconnected
-    local showInput = (displayFilter.showInput and meterType == _G.MeterType.providing)
-    local showOutput = (displayFilter.showOutput and meterType == _G.MeterType.using)
+    local showInput = (displayFilter.showInput and (transferType == _G.TransferType.Input or transferType == _G.TransferType.Both))
+    local showOutput = (displayFilter.showOutput and (transferType == _G.TransferType.Output or transferType == _G.TransferType.Both))
 
     local show = (showDisconnected and (showInput or showOutput)) or (showConnected and (showInput or showOutput))
 
@@ -521,27 +560,29 @@ end
 -- SORTING --
 -------------
 
-sortEnergyMeters = function()
-	sortedEnergyMeters = {}
-	for k,v in pairs(energyMeters) do table.insert(sortedEnergyMeters, v) end
+sortTransferrers = function()
+	sortedTransferrers = {}
+	for k,v in pairs(transferrers) do table.insert(sortedTransferrers, v) end
 
     if sortingAttr == "name" then
-        table.sort(sortedEnergyMeters, function(v1, v2) return v1.name:upper() < v2.name:upper() end)
+        table.sort(sortedTransferrers, function(v1, v2) 
+            return v1.name:upper() < v2.name:upper()
+        end)
     elseif sortingAttr == "rate" then
-        table.sort(sortedEnergyMeters, function(v1, v2) 
-            local t1, t2
-            if v1.data.transfer == nil then t1 = 0 else t1 = v1.data.transfer end
-            if v2.data.transfer == nil then t2 = 0 else t2 = v2.data.transfer end
+        table.sort(sortedTransferrers, function(v1, v2) 
+            local t1 = math.max(v1.data.transferIn or 0, v1.data.transferOut or 0)
+            local t2 = math.max(v2.data.transferIn or 0, v2.data.transferOut or 0)
             return t1 < t2
         end)
     end
+    
 
     if sortingDir == "desc" then
         local reversed = {}
-        for i = #sortedEnergyMeters, 1, -1 do
-            table.insert(reversed, sortedEnergyMeters[i])
+        for i = #sortedTransferrers, 1, -1 do
+            table.insert(reversed, sortedTransferrers[i])
         end
-        sortedEnergyMeters = reversed
+        sortedTransferrers = reversed
     end
 end
 

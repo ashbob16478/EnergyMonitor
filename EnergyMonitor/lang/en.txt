@@ -78,8 +78,8 @@
   installerIntroLineNine = "That's everything you have to do.",
   
   installerServerOrClient = "If this computer is a server type 's', if it is a remote monitor type 'm', else 'c' for client.",
-  installerClientMeterOrStorage = "If this computer is attached to a energy storage type 's' else 'm' for an energy meter.",
-  installerClientMeterType = "If the energymeter measures the incoming transfer rate of an energy store type '0', for outgoing '1'.",
+  installerClientTransferrerOrStorage = "If this computer is attached to a energy storage type 's' else 't' for an energy transferrer.",
+  installerClientTransferrerType = "If the energymeter measures the incoming transfer rate of an energy store type '0', for outgoing '1', for both '2'.",
 
   installerLabelLineOne = "It is recommended to label the computer.",
   installerLabelInfo = "The label is later shown on the UI as the name of the device.",

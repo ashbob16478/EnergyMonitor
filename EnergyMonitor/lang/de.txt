@@ -78,8 +78,8 @@
   installerIntroLineNine = "Das ist alles, was du tun musst.",
     
   installerServerOrClient = "Wenn der Computer ein server ist, schreibe ein 's', für einen monitor ein 'm' und ansonsten ein 'c' für client.",
-  installerClientMeterOrStorage = "Wenn der Computer an einen Stromspeicher angeschlossen ist schreibe ein 's' ansonsten ein 'm' für ein Strommessgerät.",
-  installerClientMeterType = "Wenn das Strommessgerät den ankommenden Stromfluss eines Speichers misst, schreibe eine '0', für  abgehenden eine '1'.",
+  installerClientTransferrerOrStorage = "Wenn der Computer an einen Stromspeicher angeschlossen ist schreibe ein 's' ansonsten ein 't' für ein Strommessgerät.",
+  installerClientTransferrerType = "Wenn das Strommessgerät den ankommenden Stromfluss eines Speichers misst, schreibe eine '0', für abgehenden eine '1', für beides eine '2'.",
 
   installerLabelLineOne = "Es wird empfohlen den Computer zu labeln.",
   installerLabelInfo = "Das Label wird später auf der UI als Gerätename angezeigt.",
