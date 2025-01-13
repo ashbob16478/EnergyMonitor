@@ -174,14 +174,14 @@ local toggleFilterShowSpecificTypeText
 listen = function()
     -- Receive data from server
     while true do
+        local msg = _G.receiveMessage()
+
         if msg.type == _G.MessageType.Monitor and msg.sender == _G.Sender.Server then
-
-            local clock = os.clock()
-		
-            timeLbl:setText("Time running: " .. convertTicksToTime(os.clock() * 20))
             
-            local msg = _G.receiveMessage()
-
+            local clock = os.clock()
+            
+            timeLbl:setText("Time running: " .. convertTicksToTime(clock * 20))
+            
             if debugPrint then
                 term.redirect(term.native())
                 term.clear()
