@@ -9,7 +9,7 @@ function _G.formatDecimals(number, decimals)
 end
 
 function _G.convertTicksToTime(ticks)
-  local seconds = ticks / 20
+  local seconds = math.floor(ticks / 20)
   local minutes = math.floor(seconds / 60)
   local hours = math.floor(minutes / 60)
   local days = math.floor(hours / 24)
