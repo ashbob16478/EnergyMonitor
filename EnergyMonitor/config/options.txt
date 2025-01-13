@@ -1,9 +1,9 @@
 {
-  version = "1.7-release",
-  program = "server",
+  version = "1.6.6.9-release",
+  program = "n/a",
   language = "en",
-  peripheralType = "transfer",
-  transferType = "both",
+  peripheralType = "n/a",
+  transferType = "n/a",
   modemChannel = 5,
   pingInterval = 0.5,
   autoUpdate = 1,
