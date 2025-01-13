@@ -10,7 +10,7 @@ _G.controlMonitor = "" --Monitor
 _G.wirelessModem = "" --wirelessModem
 _G.enableWireless = false
 
-_G.energyMeter = nil --Energy Meter
+_G.transferrer = nil --Energy Transfer
 _G.capacitor = nil --Energy Storage
 
 --Total count of all attachments
@@ -41,10 +41,10 @@ local function searchPeripherals()
                 _G.wirelessModem = peri
                 _G.enableWireless = true
             end
-        elseif periType == "energymeter" then
-            print("Energy Meter - "..periItem)
-            _G.energyMeter = newEnergyMeter("em0", peri, periItem, periType)
-        else
+        end
+
+
+        if _G.peripheralType == "capacitor" then
             local successGetEnergyStored, errGetEnergyStored = pcall(function() peri.getEnergyStored() end)
             local isMekanism = periType == "inductionMatrix" 
                 or periType == "mekanismMachine" 
@@ -77,6 +77,49 @@ local function searchPeripherals()
                 _G.capacitor = newDraconicEnergyStorage("ec0", peri, periItem, periType)
             end
         end
+
+
+        if _G.peripheralType == "transfer" then
+            local successGetEnergyTransferInput, errGetEnergyTransferInput = pcall(function() peri.getEnergyTransferInput() end)
+            local isMekanism = periType == "inductionMatrix" 
+                or periType == "mekanismMachine" 
+                or periType == "Induction Matrix" 
+                or periType == "mekanism:induction_port" 
+                or periType == "inductionPort"
+                or string.find(periType, "rftoolspower:cell")
+                or string.find(periType, "Energy Cube")
+                or string.find(periType, "EnergyCube")
+			
+            local isEnergyMeter = periType == "energymeter"
+
+			local isDraconicEvolution = periType == "draconic_rf_storage"
+
+            local isBase = (not isMekanism and not isThermalExpansion and not isDraconicEvolution) and successGetEnergyTransfer
+
+            if isBase then
+                --Capacitorbank / Energycell / Energy Core
+                print("getEnergyTransferInput() device - "..peripheralList[i])
+                _G.transferrer = newEnergyTransfer("ec0", peri, periItem, periType, _G.transferType)
+            end
+
+            if isMekanism then
+                --Mekanism V10plus 
+                print("Mekanism Energy Transfer device - "..peripheralList[i])
+                _G.transferrer = newMekanismEnergyTransfer("ec0", peri, periItem, periType, _G.transferType)
+            end
+
+            if isEnergyMeter then
+                print("Energy Meter - "..periItem)
+                _G.transferrer = newEnergyMeter("em0", peri, periItem, periType, _G.transferType)
+            end
+			
+			if isDraconicEvolution then
+                --Draconic energy core
+                print("DraconicEvolution Energy Storage device - "..peripheralList[i])
+                error("Draconic Transfer not yet supported")
+            end
+        end
+            
     end
 end
 

@@ -8,10 +8,10 @@ local clientInfo = {
 }
 local connectedClients = {}
 local capacitors = {}
-local energyMeters = {}
+local transferrers = {}
 local connectedClientsCount = 0
 local capacitorsCount = 0
-local energyMetersCount = 0
+local transferrersCount = 0
 local debugPrint = false
 
 
@@ -37,9 +37,9 @@ end
 
 local function totalOutputRate()
     local total = 0
-    for k, v in pairs(energyMeters) do
-        if v.data.meterType == _G.MeterType.using then
-            total = total + v.data.transfer
+    for k, v in pairs(transferrers) do
+        if v.data.transferType == _G.TransferType.Output or v.data.transferType == _G.TransferType.Both then
+            total = total + v.data.transferOut
         end
     end
     return total
@@ -47,9 +47,9 @@ end
 
 local function totalInputRate()
     local total = 0
-    for k, v in pairs(energyMeters) do
-        if v.data.meterType == _G.MeterType.providing then
-            total = total + v.data.transfer
+    for k, v in pairs(transferrers) do
+        if v.data.transferType == _G.TransferType.Input or v.data.transferType == _G.TransferType.Both then
+            total = total + v.data.transferIn
         end
     end
     return total
@@ -63,8 +63,8 @@ local function addClient(client)
 
         if (capacitors[client.id] ~= nil) then
             capacitors[client.id] = client
-        elseif (energyMeters[client.id] ~= nil) then
-            energyMeters[client.id] = client
+        elseif (transferrers[client.id] ~= nil) then
+            transferrers[client.id] = client
         end
     else
         -- add client
@@ -72,9 +72,9 @@ local function addClient(client)
         connectedClientsCount = connectedClientsCount + 1
 
         -- add clientid to respective list
-        if client.type == _G.MessageDataPeripheral.EnergyMeter then
-            energyMeters[client.id] = client
-            energyMetersCount = energyMetersCount + 1
+        if client.type == _G.MessageDataPeripheral.Transfer then
+            transferrers[client.id] = client
+            transferrersCount = transferrersCount + 1
         elseif client.type == _G.MessageDataPeripheral.Capacitor then
             capacitors[client.id] = client
             capacitorsCount = capacitorsCount + 1
@@ -90,9 +90,9 @@ local function dropNotRespondingClients()
             connectedClientsCount = connectedClientsCount - 1
 
             -- remove clientid from respective list
-            if v.type == _G.MessageDataPeripheral.EnergyMeter then
-                energyMeters[k] = nil
-                energyMetersCount = energyMetersCount - 1
+            if v.type == _G.MessageDataPeripheral.Transfer then
+                transferrers[k] = nil
+                transferrersCount = transferrersCount - 1
             elseif v.type == _G.MessageDataPeripheral.Capacitor then
                 capacitors[k] = nil
                 capacitorsCount = capacitorsCount - 1
@@ -153,11 +153,12 @@ local function listen()
                 print("Type: " .. _G.parsePeripheralType(msg.messageData.peripheral)) 
             end
             
-            if msg.messageData.peripheral == _G.MessageDataPeripheral.EnergyMeter then
+            if msg.messageData.peripheral == _G.MessageDataPeripheral.Transfer then
                 debugOutput("Client: "..data.name)
                 debugOutput("ID: "..data.id)
-                debugOutput("Transfer: "..data.transfer)
-                debugOutput("Mode: "..data.mode)
+                debugOutput("Transfer In: "..data.transferIn)
+                debugOutput("Transfer In: "..data.transferOut)
+                --debugOutput("Mode: "..data.mode)
                 debugOutput("Status: "..data.status)
             elseif msg.messageData.peripheral == _G.MessageDataPeripheral.Capacitor then
                 debugOutput("Client: "..data.name)
@@ -169,8 +170,11 @@ local function listen()
             end
 
             debugOutput("Connected clients: "..connectedClientsCount)
-            debugOutput("Energy Meters: "..energyMetersCount)
+            debugOutput("Energy Transferrers: "..transferrersCount)
             debugOutput("Capacitors: "..capacitorsCount)
+
+            debugOutput("Total In: " ..totalInputRate())
+            debugOutput("Total Out: " ..totalOutputRate())
 
             -- Write to terminal
             term.redirect(term.native())
@@ -190,8 +194,8 @@ local function sendMonitorData()
 
         monitorData.capacitors = capacitors
         monitorData.capacitorsCount = capacitorsCount
-        monitorData.energyMeters = energyMeters
-        monitorData.energyMetersCount = energyMetersCount
+        monitorData.transferrers = transferrers
+        monitorData.transferrersCount = transferrersCount
         monitorData.storedEnergy = totalEnergy()
         monitorData.maxEnergy = totalMaxEnergy()
         monitorData.energyPercentage = energyPercentage()

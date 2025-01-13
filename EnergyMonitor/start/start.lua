@@ -43,12 +43,13 @@ function _G.loadOptionFile()
 	--Assign values to variables
 	_G.version = optionList["version"]
 	_G.program = optionList["program"]
-	_G.meterType = optionList["meterType"]
-	_G.debugEnabled = optionList["debug"]
 	_G.lang = optionList["language"]
+	_G.peripheralType = optionList["peripheralType"]
+	_G.transferType = optionList["transferType"]
 	_G.modemChannel = optionList["modemChannel"]
 	_G.pingInterval = optionList["pingInterval"]
 	_G.autoUpdate = optionList["autoUpdate"]
+	_G.debugEnabled = optionList["debug"]
 end
 
 --Refreshes the options list
@@ -279,17 +280,40 @@ end
 
 
 function initClasses()
-    --Execute necessary class files
+    -- Create base paths
     local binPath = "/EnergyMonitor/classes/"
-    shell.run(binPath.."base/EnergyStorage.lua")
-	shell.run(binPath.."base/EnergyMeter.lua")
-    shell.run(binPath.."mekanism/MekanismEnergyStorage.lua")
-	shell.run(binPath.."draconicEvolution/DraconicEnergyStorage.lua")
-    shell.run(binPath.."Peripherals.lua")
-    shell.run(binPath.."Language.lua")
-	shell.run("/EnergyMonitor/config/input.lua")
-	shell.run(binPath.."transport/startup.lua")
-    shell.run(binPath.."transport/Message.lua")
+	local periPath = binPath.."peripherals/"
+	local transportPath = binPath.. "transport/"
+
+	-- Load Peripherals support
+    shell.run(periPath.."base/EnergyStorage.lua")
+	shell.run(periPath.."base/EnergyTransfer.lua")
+	shell.run(periPath.."Peripherals.lua")
+
+	-- Load Language localization
+	shell.run(binPath.."Language.lua")
+
+	-- Load utils
+	shell.run(binPath.."Utils.lua")
+
+	-- Load NetworkMessenger with Packets
+    shell.run(transportPath.."Networking.lua")
+	
+
+
+	---------------------------
+	-- Add Mod Support below --
+	---------------------------
+
+	-- Energy Meters Mod Support
+	shell.run(periPath.."energyMeter/EnergyMeter.lua")
+
+	-- Mekanism Mod Support
+    shell.run(periPath.."mekanism/MekanismEnergyStorage.lua")
+	shell.run(periPath.."mekanism/MekanismEnergyTransfer.lua")
+
+	-- Draconic Evolution Mod Support
+	shell.run(periPath.."draconicEvolution/DraconicEnergyStorage.lua")
 end
 
 

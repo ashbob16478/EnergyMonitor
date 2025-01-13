@@ -217,6 +217,8 @@ end
 --===== Run installation =====
 
 local meterType = -1
+local peripheralType = ""
+local transferType = ""
 local programType = ""
 
 --load language data
@@ -247,7 +249,6 @@ if not update then
   print(selectedLang:getText("installerServerOrClient"))
   term.write("Input: ")
     programType = read()
-    local meterTypeStr = ""
     if programType == "s" then
       programType = "server"
     elseif programType == "m" then
@@ -257,18 +258,25 @@ if not update then
 
       term.clear()
       term.setCursorPos(1,1)
-      print(selectedLang:getText("installerClientMeterOrStorage"))
+      print(selectedLang:getText("installerClientTransferrerOrStorage"))
       local clientType = read()
       term.write("Input: ")
-      if clientType == "m" then
-
+      if clientType == "t" then
+        peripheralType = "transfer"
         term.clear()
         term.setCursorPos(1,1)
-        print(selectedLang:getText("installerClientMeterType"))
-        meterType = tonumber(read())
+        print(selectedLang:getText("installerClientTransferrerType"))
+        transferTypeNumber = tonumber(read())
+        if transferTypeNumber == 0 then
+          transferType = "input"
+        elseif transferTypeNumber == 1 then
+          transferType = "output"
+        else
+          transferType = "both"
+        end
 
       elseif clientType == "s" then
-
+        peripheralType = "capacitor"
       else
         error(selectedLang:getText("installerInvalidInput"))
       end
@@ -385,7 +393,8 @@ updateOptionFileWithLanguage()
 --settings
 if not update then
   updateOptionFile("program", programType)
-  updateOptionFile("meterType", meterType)
+  updateOptionFile("transferType", transferType)
+  updateOptionFile("peripheralType", peripheralType)
 end
 
 --Get Remote version file

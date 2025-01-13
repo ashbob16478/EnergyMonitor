@@ -8,20 +8,22 @@
   class = {
     name = "Class",
     files = {
-      "classes/base/EnergyMeter.lua",
-      "classes/base/EnergyStorage.lua",
-      "classes/mekanism/MekanismEnergyStorage.lua",
-	    "classes/draconicEvolution/DraconicEnergyStorage.lua",
-      "classes/transport/Message.lua",
+      "classes/peripherals/base/EnergyStorage.lua",
+      "classes/peripherals/base/EnergyTransfer.lua",
+      "classes/peripherals/draconicEvolution/DraconicEnergyStorage.lua",
+      "classes/peripherals/energyMeter/EnergyMeter.lua",
+      "classes/peripherals/mekanism/MekanismEnergyStorage.lua",
+      "classes/peripherals/mekanism/MekanismEnergyTransfer.lua",
+      "classes/peripherals/Peripherals.lua",
+      "classes/transport/Networking.lua",
       "classes/Language.lua",
-      "classes/Peripherals.lua"
+      "classes/Utils.lua"
     }
   },
   config = {
     name = "Config",
     files = {
-      "config/input.lua",
-      "config/options.txt",
+      "config/options.txt"
     }
   },
   lang = {
@@ -34,10 +36,10 @@
   program = {
     name = "Program",
     files = {
+      "program/basalt.lua",
       "program/client.lua",
       "program/monitor.lua",
-      "program/server.lua",
-      "program/basalt.lua"
+      "program/server.lua"
     }
   },  
   start = {
