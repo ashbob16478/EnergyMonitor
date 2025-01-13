@@ -1,11 +1,5 @@
 -- EnergyTransfer Base Class
-local MekanismEnergyTransfer = {
-    name = "",
-    id = {},
-    type = "",
-    transferType = "both", -- "input", "output", or "both"
-    status = "",
-
+local MekanismEnergyTransfer = setmetatable({
     successGetLastInput = false,
     successGetLastOutput = false,
 
@@ -25,7 +19,7 @@ local MekanismEnergyTransfer = {
             return 0
         end
     end
-}
+}, {__index = EnergyTransfer})
 
 function _G.newMekanismEnergyTransfer(name, id, side, type, transferType)
     print("Creating new Mekanism Energy Transfer")
