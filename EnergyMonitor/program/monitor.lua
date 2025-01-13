@@ -110,6 +110,7 @@ local footer = flex:addFrame():setBackground(footerColor):setSize("parent.w", fo
 local prevBtn = {}
 local nextBtn = {}
 local versionFooter = flex:addFrame():setBackground(versionFooterColor):setSize("parent.w", 1)
+local timeLbl = {}
 
 -- amount of cells per page
 local flexWidth, flexHeight = main:getSize()
@@ -174,6 +175,9 @@ listen = function()
     -- Receive data from server
     while true do
         local clock = os.clock()
+		
+		timeLbl:setText("Time running: " .. os.clock() .. "s")
+		
         local msg = _G.receiveMessage()
 
         if debugPrint then
@@ -260,7 +264,8 @@ setupMonitor = function()
     nextBtn = footer:addButton():setText("Next"):setSize(btnWidth, btnHeight):setPosition("parent.w-"..btnWidth, math.ceil(footerHeight / 2) + math.floor(btnHeight / 2)):setBackground(btnDefaultColor):onClick(basalt.schedule(function(self)
         animateButtonClick(self)
       end), nextPage)
-    versionFooter:addLabel():setText("version: " .. _G.version):setFontSize(1):setSize("parent.w", 1):setPosition(0, versionFooterHeight):setTextAlign("right"):setForeground(colors.gray)
+	versionFooter:addLabel():setText("version: " .. _G.version):setFontSize(1):setSize("parent.w/2", 1):setPosition("parent.w/2", versionFooterHeight):setTextAlign("right"):setForeground(colors.gray)
+	timeLbl = versionFooter:addLabel():setText("Time running: "):setFontSize(1):setSize("parent.w/2", 1):setPosition(1, versionFooterHeight):setTextAlign("left"):setForeground(colors.gray)
 
     -- auto update the monitor
     basalt.autoUpdate()

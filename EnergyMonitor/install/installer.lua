@@ -216,7 +216,6 @@ end
 
 --===== Run installation =====
 
-local meterType = -1
 local peripheralType = ""
 local transferType = ""
 local programType = ""
