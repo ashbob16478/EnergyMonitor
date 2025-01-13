@@ -354,7 +354,7 @@ updateDisplayCells = function()
         if displayCells[k].dpRateOut then
             displayCells[k].dpRateOut:setText(_G.numberToEnergyUnit(d.transferOut) .. "/t")
         end
-        --displayCells[k].dpType:setText(_G.parseTransferType(d.transferType))
+        displayCells[k].dpType:setText(_G.parseTransferType(d.transferType))
         --displayCells[k].dpState:setText(d.status)
     end
 end
