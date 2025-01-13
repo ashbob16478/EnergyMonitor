@@ -20,7 +20,7 @@ local MekanismEnergyTransfer = {
 
     transferRateOutput = function(self)
         if transferType == "output" or transferType == "both" then
-            return defaultNil(self.id.getLastInput(), 0) * 0.4 -- Assuming this method exists
+            return defaultNil(self.id.getLastOutput(), 0) * 0.4 -- Assuming this method exists
         else
             return 0
         end
