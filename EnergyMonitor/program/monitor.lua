@@ -176,7 +176,7 @@ listen = function()
     while true do
         local clock = os.clock()
 		
-		timeLbl:setText("Time running: " .. os.clock() .. "s")
+		timeLbl:setText("Time running: " .. convertTicksToTime(os.clock() * 20))
 		
         local msg = _G.receiveMessage()
 
