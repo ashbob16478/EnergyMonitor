@@ -9,7 +9,7 @@ local EnergyTransfer = {
     -- Basic Methods
     transferRateInput = function(self)
         if transferType == _G.TransferType.Input or transferType == _G.TransferType.Both then
-            return self.id.getTransferRateInput() -- Assuming this method exists
+            return defaultNil(self.id.getTransferRateInput(), 0) -- Assuming this method exists
         else
             return 0
         end
@@ -17,7 +17,7 @@ local EnergyTransfer = {
 
     transferRateOutput = function(self)
         if transferType == _G.TransferType.Output or transferType == _G.TransferType.Both then
-            return self.id.getTransferRateOutput() -- Assuming this method exists
+            return defaultNil(self.id.getTransferRateOutput(), 0) -- Assuming this method exists
         else
             return 0
         end

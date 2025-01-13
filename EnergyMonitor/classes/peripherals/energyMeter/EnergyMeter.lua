@@ -50,7 +50,7 @@ local EnergyMeter = setmetatable({
 
     transferRateInput = function(self)
         if transferType == _G.TransferType.Input then
-            return self.id.getTransferRate() -- Assuming this method exists
+            return defaultNil(self.id.getTransferRate(), 0) -- Assuming this method exists
         else
             return 0
         end
@@ -58,7 +58,7 @@ local EnergyMeter = setmetatable({
 
     transferRateOutput = function(self)
         if transferType == _G.TransferType.Output then
-            return self.id.getTransferRate() -- Assuming this method exists
+            return defaultNil(self.id.getTransferRate(), 0) -- Assuming this method exists
         else
             return 0
         end
