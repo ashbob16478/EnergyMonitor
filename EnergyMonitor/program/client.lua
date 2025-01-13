@@ -31,7 +31,7 @@ while true do
             peripheralData.transferOut = _G.transferrer:transferRateOutput()
             peripheralData.transferType = _G.transferType
             -- TODO: set appropriate status (DISCONNECTED when no energy is transferred)
-            peripheralData.status = ""
+            peripheralData.status = "N/A"
             
             _G.printEnergyTransferData(_G.transferrer)
         elseif _G.capacitor ~= nil then
