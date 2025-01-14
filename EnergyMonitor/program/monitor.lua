@@ -174,21 +174,21 @@ local toggleFilterShowSpecificTypeText
 listen = function()
     -- Receive data from server
     while true do
-        local clock = os.clock()
-		
-		timeLbl:setText("Time running: " .. os.clock() .. "s")
-		
         local msg = _G.receiveMessage()
 
-        if debugPrint then
-            term.redirect(term.native())
-            term.clear()
-            term.setCursorPos(1,1)
-            print(clock)
-            print("Receiving monitor data from server on channel: ".._G.modemChannel)
-        end
-
         if msg.type == _G.MessageType.Monitor and msg.sender == _G.Sender.Server then
+            
+            local clock = os.clock()
+            
+            timeLbl:setText("Time running: " .. convertTicksToTime(clock * 20))
+            
+            if debugPrint then
+                term.redirect(term.native())
+                term.clear()
+                term.setCursorPos(1,1)
+                print(clock)
+                print("Receiving monitor data from server on channel: ".._G.modemChannel)
+            end
 
             -- extract data from message
             local data = msg.messageData.data
