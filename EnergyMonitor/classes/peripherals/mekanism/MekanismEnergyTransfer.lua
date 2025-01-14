@@ -6,7 +6,7 @@ local MekanismEnergyTransfer = setmetatable({
     -- Basic Methods
     transferRateInput = function(self)
         if transferType == "input" or transferType == "both" then
-            return defaultNil(self.id.getLastInput(), 0) * 0.4 -- Assuming this method exists
+            return defaultNil(self.id.getLastInput(), 0) * 0.4
         else
             return 0
         end
@@ -14,7 +14,7 @@ local MekanismEnergyTransfer = setmetatable({
 
     transferRateOutput = function(self)
         if transferType == "output" or transferType == "both" then
-            return defaultNil(self.id.getLastOutput(), 0) * 0.4 -- Assuming this method exists
+            return defaultNil(self.id.getLastOutput(), 0) * 0.4
         else
             return 0
         end

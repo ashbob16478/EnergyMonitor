@@ -115,8 +115,8 @@ local function searchPeripherals()
 			
 			if isDraconicEvolution then
                 --Draconic energy core
-                print("DraconicEvolution Energy Storage device - "..peripheralList[i])
-                error("Draconic Transfer not yet supported")
+                print("DraconicEvolution Energy Transfer device - "..peripheralList[i])
+                _G.transferrer = newDraconicEnergyTransfer("ec0", peri, periItem, periType, _G.transferType)
             end
         end
             
