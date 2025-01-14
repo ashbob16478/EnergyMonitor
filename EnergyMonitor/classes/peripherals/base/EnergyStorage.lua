@@ -9,6 +9,7 @@ local EnergyStorage = {
     side = "",
     type = "",
     
+    -- overwrite these functions in specific mod support implementations with the corresponding api function
     energy = function(self)
         return _G.defaultNil(self.id.getEnergyStored(), 0)
     end,

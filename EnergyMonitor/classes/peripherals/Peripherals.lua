@@ -18,6 +18,7 @@ _G.amountMonitors = 0
 _G.smallMonitor = 1
 _G.amountClients = 0
 
+-- function that grabs all peripherals and initializes the correct one as client
 local function searchPeripherals()
     local peripheralList = peripheral.getNames()
     for i = 1, #peripheralList do
@@ -120,6 +121,7 @@ local function searchPeripherals()
             end
 
             if isEnergyMeter then
+                --Energymeter
                 print("Energy Meter - "..periItem)
                 _G.transferrer = newEnergyMeter("em0", peri, periItem, periType, _G.transferType)
             end
@@ -140,6 +142,7 @@ local function searchPeripherals()
     end
 end
 
+-- function that grabs all peripherals and checks if the required ones are attached
 function _G.checkPeripherals()
     --Check for errors
     term.clear()
@@ -175,6 +178,7 @@ function _G.checkPeripherals()
     end
 end
 
+-- function that creates the connection from the modem on the channel from the config
 function setupModemConnection()
     debugOutput("Setup Modem Connection on channel " .. _G.modemChannel)
     if _G.enableWireless then
@@ -182,7 +186,7 @@ function setupModemConnection()
     end
 end
 
-
+-- function that will grab all attached peripherals, set up the correct one and connect the modem to the server
 function _G.initPeripherals()
     searchPeripherals()
     _G.checkPeripherals()

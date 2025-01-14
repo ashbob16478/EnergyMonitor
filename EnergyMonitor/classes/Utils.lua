@@ -1,13 +1,16 @@
+-- function to convert a decimal number
 function formatNumberComma(number)
     local finalOutput =  format_int(number)
    
     return finalOutput
 end
 
+-- function to format a number to have a specific amount of decimals
 function _G.formatDecimals(number, decimals) 
     return string.format("%." .. decimals .. "f", number)
 end
 
+-- function to convert game ticks to human readable time
 function _G.convertTicksToTime(ticks)
   local seconds = math.floor(ticks / 20)
   local minutes = math.floor(seconds / 60)
@@ -35,6 +38,7 @@ function _G.convertTicksToTime(ticks)
   return finalOutput
 end
 
+-- function to convert a number with energy unit back to a number in base unit
 function _G.EnergyWithUnitToNumber(energy)
   --extract number and unit separately from string
   local number = energy:match("%d+%.?%d*")
@@ -60,6 +64,7 @@ function _G.EnergyWithUnitToNumber(energy)
   end
 end
 
+-- function to convert a number to a string with the optimal unit at the end
 function _G.numberToEnergyUnit(number)
   -- turn 1000 into 1kFE
   -- turn 1000000 into 1MFE
@@ -102,6 +107,7 @@ function _G.numberToEnergyUnit(number)
   return formatDecimals(value, 1) .. " " .. unit
 end
 
+-- function to add delimiters to a number
 function format_int(number)
   --thanks to https://stackoverflow.com/questions/10989788/format-integer-in-lua answer by Bert Kiers
   local i, j, minus, int, fraction = tostring(number):find('([-]?)(%d+)([.]?%d*)')
@@ -130,18 +136,22 @@ function format_int(number)
   return minus .. int:reverse():gsub("^%p", "") .. fraction
 end
 
+-- auxilary function for ternary operator (cond ? T : F)
 function _G.ternary ( cond , T , F )
   if cond then return T else return F end
 end
 
+-- auxilary function to return default value when input is Nil
 function _G.defaultNil ( val , def )
   return ternary(val == nil, def, val)
 end
 
+-- auxilary function to return default value when input is Infinity
 function _G.defaultInf ( val, def )
   return ternary(tostring(val) == "inf", def, val)
 end
 
+-- auxilary function to set return default value if input is Nan
 function _G.defaultNan ( val , def )
   return ternary(val ~= val, def, val)
 end
