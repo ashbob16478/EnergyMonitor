@@ -14,7 +14,7 @@ local capacitorsCount = 0
 local transferrersCount = 0
 local debugPrint = false
 
-
+-- compute total energy stored from all capacitors
 local function totalEnergy()
     local total = 0
     for k, v in pairs(capacitors) do
@@ -23,6 +23,7 @@ local function totalEnergy()
     return total
 end
 
+-- compute maximal energy storable from all capacitors
 local function totalMaxEnergy()
     local total = 0
     for k, v in pairs(capacitors) do
@@ -31,10 +32,12 @@ local function totalMaxEnergy()
     return total
 end
 
+-- compute fill level of all capacitors
 local function energyPercentage()
     return _G.defaultNil(_G.defaultNan(totalEnergy() / totalMaxEnergy(), 0), 0) * 100
 end
 
+-- compute total output transfer rate of all transferrers
 local function totalOutputRate()
     local total = 0
     for k, v in pairs(transferrers) do
@@ -45,6 +48,7 @@ local function totalOutputRate()
     return total
 end
 
+-- compute total input transfer rate of all transferrers
 local function totalInputRate()
     local total = 0
     for k, v in pairs(transferrers) do
@@ -55,6 +59,7 @@ local function totalInputRate()
     return total
 end
 
+-- add new client to the connected ones (either transferrer or capacitor)
 local function addClient(client) 
     -- add client to connectedClients
     if connectedClients[client.id] ~= nil then
@@ -82,6 +87,7 @@ local function addClient(client)
     end
 end
 
+-- remove all clients that did not respond in last x seconds
 local function dropNotRespondingClients()
     -- remove client from connectedClients if lastPing is older than timeout
     for k, v in pairs(connectedClients) do
@@ -101,6 +107,7 @@ local function dropNotRespondingClients()
     end
 end
 
+-- send ping to all clients asking for updated values
 local function ping_clients()
     while true do
         term.clear()
@@ -123,6 +130,7 @@ local function ping_clients()
     end
 end
 
+-- listen for incoming updated datastructures from clients
 local function listen()
     -- Receive data from all connected clients
     while true do
@@ -132,7 +140,6 @@ local function listen()
         setmetatable(client, {__index = clientInfo})
 
         if msg.type == _G.MessageType.Update then
-            -- Write to monitor
 
             -- extract data from message and setup clientInfo
             local data = msg.messageData.data
@@ -142,7 +149,7 @@ local function listen()
             client.type = msg.messageData.peripheral
             client.lastPing = clock
 
-            -- add client as connected
+            -- set client as connected if not already done
             addClient(client)
 
             if debugPrint then
@@ -154,6 +161,8 @@ local function listen()
             end
             
             if msg.messageData.peripheral == _G.MessageDataPeripheral.Transfer then
+
+                -- data received is from a transferrer, print its values on debug
                 debugOutput("Client: "..data.name)
                 debugOutput("ID: "..data.id)
                 debugOutput("Transfer In: "..data.transferIn)
@@ -161,6 +170,8 @@ local function listen()
                 --debugOutput("Mode: "..data.mode)
                 debugOutput("Status: "..data.status)
             elseif msg.messageData.peripheral == _G.MessageDataPeripheral.Capacitor then
+
+                -- data received is from a capacitor, print its values on debug
                 debugOutput("Client: "..data.name)
                 debugOutput("ID: "..data.id)
                 debugOutput("Energy: "..data.energy)
@@ -169,6 +180,7 @@ local function listen()
                 debugOutput("Status: "..data.status)
             end
 
+            -- debug print internal state of data structures
             debugOutput("Connected clients: "..connectedClientsCount)
             debugOutput("Energy Transferrers: "..transferrersCount)
             debugOutput("Capacitors: "..capacitorsCount)
@@ -182,16 +194,20 @@ local function listen()
     end
 end
 
+-- send merged data structure to all monitors
 local function sendMonitorData()
     while true do
         -- prepare data for sending to monitor
         local data = {}
         setmetatable(data, {__index = _G.MessageData})
+        -- assign invalid peripheral, since we dont use it
         data.peripheral = -1
 
+        -- create new monitor data datastructure to save all neccessary information
         local monitorData = {}
         setmetatable(monitorData, {__index = _G.MonitorData})
 
+        -- retrieve/calculate all values and store them in our data object 
         monitorData.capacitors = capacitors
         monitorData.capacitorsCount = capacitorsCount
         monitorData.transferrers = transferrers
@@ -202,6 +218,7 @@ local function sendMonitorData()
         monitorData.inputRate = totalInputRate()
         monitorData.outputRate = totalOutputRate()
 
+        -- assign the data to the monitor update packet
         data.data = monitorData
 
         -- send data to all monitors

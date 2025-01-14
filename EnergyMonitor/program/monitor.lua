@@ -171,6 +171,7 @@ local toggleFilterShowSpecificTypeText
 -- Retrieving Data --
 ---------------------
 
+-- function to receive monitor data from server
 listen = function()
     -- Receive data from server
     while true do
@@ -180,6 +181,7 @@ listen = function()
             
             local clock = os.clock()
             
+            -- print time running to footer of monitor
             timeLbl:setText("Time running: " .. convertTicksToTime(clock * 20))
             
             if debugPrint then
@@ -206,7 +208,10 @@ listen = function()
             -- calculate if the energy storage is being charged or discharged
             effectiveRate = inputRate - outputRate
 			
+            -- sort the transferrers that are displayed on screen based on filters
             sortTransferrers()
+
+            -- update monitor display with new values
 			reloadPage()
         end
     end
@@ -218,7 +223,7 @@ end
 -- Setup UI --
 --------------
 
-
+-- set up all ui element references 
 setupMonitor = function()
     -- setup header
     energyLbl = header:addLabel():setText("Energy: STORED"):setFontSize(1):setSize("parent.w / 2", 1):setPosition(0, 1):setTextAlign("center")
@@ -271,6 +276,7 @@ setupMonitor = function()
     basalt.autoUpdate()
 end
 
+-- add a new display cell for a given peripheral id
 addDisplayCell = function(peripheralId)
     -- add display cell to the monitor
     if displayCells[peripheralId] == nil then
@@ -282,6 +288,7 @@ addDisplayCell = function(peripheralId)
     end
 end
 
+-- remove an existing display cell for a given peripheral id
 removeDisplayCell = function(peripheralId)
     -- remove display cell from the monitor
     if displayCells[peripheralId] ~= nil then
@@ -299,11 +306,13 @@ end
 -- UPDATE UI VALUES --
 ----------------------
 
+-- function to update the stored energy on UI
 updateEnergyDisplay = function()
     energyLbl:setText("Energy: " .. _G.numberToEnergyUnit(storedEnergy) .. "/" .. _G.numberToEnergyUnit(maxEnergy) .. " (" .. _G.formatDecimals(energyPercentage, 1) .. "%)")
     energyBar:setProgress(tonumber(_G.defaultInf(_G.defaultNil(_G.formatDecimals(energyPercentage, 0), 0), 0)))
 end
 
+-- function to update the current energy transfer on UI
 updateTransferDisplay = function()
     rateLblIn:setText("Transfer IN: " .. _G.numberToEnergyUnit(inputRate) .. "/t")
     rateLblOut:setText("Transfer OUT: " .. _G.numberToEnergyUnit(outputRate) .. "/t")
@@ -342,6 +351,7 @@ updateTransferDisplay = function()
     end
 end
 
+-- function to update all display cells (transferrers) with their new current values
 updateDisplayCells = function()
     for k,v in pairs(displayCells) do
         local i = v.clientInfo
@@ -359,6 +369,7 @@ updateDisplayCells = function()
     end
 end
 
+-- function that simply returns how many display cells we need for all transferrers
 countDisplayableCells = function ()
     local cnt = 0
     for k,v in pairs(transferrers) do
@@ -369,6 +380,7 @@ countDisplayableCells = function ()
     return cnt
 end
 
+-- function that calculates how many pages we need to display all cells (transferrers)
 updatePageCount = function()
     -- calculate pages needed to display all cells
     totalPageCount = math.ceil(countDisplayableCells() / totalCellsPerPage)
@@ -387,6 +399,7 @@ updatePageCount = function()
     end
 end
 
+-- function that is called to update the whole monitor screen using the above functions
 updateMonitorValues = function()
     while true do
 
@@ -420,6 +433,7 @@ end
 -- CHANGE PAGE --
 -----------------
 
+-- function to load the next page
 nextPage = function()
     if currentPageId < totalPageCount then
         currentPageId = currentPageId + 1
@@ -427,6 +441,7 @@ nextPage = function()
     end
 end
 
+-- function to load the previous page
 prevPage = function()
     if currentPageId > 1 then
         currentPageId = currentPageId - 1
@@ -434,6 +449,7 @@ prevPage = function()
     end
 end
 
+-- function that updates all cells on the current page with their new values, handles filtering and updates page count
 reloadPage = function()
     -- iterate over table with displays and hide all except the ones that are on the current page
     local startIdx = (currentPageId - 1) * totalCellsPerPage + 1
@@ -516,6 +532,7 @@ end
 -- FILTERING --
 ---------------
 
+-- function to check if a specific cell should be displayed according to set filters or not
 checkFilter = function(displayData)
     -- check if the displayData should be shown on the monitor
     local disconnected = "DISCONNECTED"
@@ -533,6 +550,7 @@ checkFilter = function(displayData)
     return show
 end
 
+-- toggle if disconnected devices should be shown or hidden
 toggleFilterShowDisconnected = function(btn)
     displayFilter.showDisconnected = not displayFilter.showDisconnected
     if not displayFilter.showDisconnected then
@@ -544,6 +562,7 @@ toggleFilterShowDisconnected = function(btn)
     reloadPage()
 end
 
+-- toggle to show cells only of specific type (input/output/all)
 toggleFilterShowSpecificType = function(type)
     displayFilter.showInput = false
     displayFilter.showOutput = false
@@ -565,6 +584,7 @@ end
 -- SORTING --
 -------------
 
+-- function to sort the transferrers by either name or rate ASC/DESC
 sortTransferrers = function()
 	sortedTransferrers = {}
 	for k,v in pairs(transferrers) do table.insert(sortedTransferrers, v) end
@@ -597,12 +617,14 @@ end
 -- ANIMATIONS --
 ----------------
 
+-- animation for button click
 animateButtonClick = function(btn)
     btn:setBackground(btnClickedColor)
     sleep(btnHighlighDuration)
     btn:setBackground(btnDefaultColor)
 end
 
+-- animation for button toggle
 animateButtonToggle = function(btn, state)
     if state then
         btn:setBackground(btnClickedColor)
@@ -611,6 +633,7 @@ animateButtonToggle = function(btn, state)
     end
 end
 
+-- animation for button group toggle
 animateButtonToggleGroup = function(btnGroup, btn)
     for k,v in pairs(btnGroup) do
         if v ~= btn then
@@ -620,6 +643,7 @@ animateButtonToggleGroup = function(btnGroup, btn)
     animateButtonToggle(btn, true)
 end
 
+-- animation with text update for filter button
 toggleFilterShowSpecificTypeText = function(btn)
     local type = btn:getText()
     if type == "Filter All" then
@@ -637,6 +661,7 @@ toggleFilterShowSpecificTypeText = function(btn)
     end
 end
 
+-- animation with text update for sorting attribute button
 toggleSortAttrText = function(btn)
     if btn:getText() == "Sort by Name" then
         btn:setText("Sort by Rate")
@@ -647,6 +672,7 @@ toggleSortAttrText = function(btn)
     end
 end
 
+-- animation with text update for sorting direction button
 toggleSortDirText = function(btn)
     if btn:getText() == "Sort Ascending" then
         btn:setText("Sort Descending")
@@ -661,14 +687,14 @@ end
 
 
 
----------------------------------------
--- ACTUAL SERVER PROGRAM STARTS HERE --
----------------------------------------
+----------------------------------------
+-- ACTUAL MONITOR PROGRAM STARTS HERE --
+----------------------------------------
 print("THIS IS THE MONITOR PROGRAM!")
 
 -- Run the pinger and the listener and monitor updaters in parallel
 parallel.waitForAll(setupMonitor, listen, updateMonitorValues)
 
--------------------------------------
--- ACTUAL SERVER PROGRAM ENDS HERE --
--------------------------------------
+--------------------------------------
+-- ACTUAL MONITOR PROGRAM ENDS HERE --
+--------------------------------------

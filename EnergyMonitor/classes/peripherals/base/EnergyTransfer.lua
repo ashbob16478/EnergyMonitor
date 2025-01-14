@@ -6,7 +6,7 @@ local EnergyTransfer = {
     transferType = "", -- "input", "output", or "both"
     status = "",
 
-    -- Basic Methods
+    -- overwrite these functions in specific mod support implementations with the corresponding api function
     transferRateInput = function(self)
         if transferType == _G.TransferType.Input or transferType == _G.TransferType.Both then
             return defaultNil(self.id.getTransferRateInput(), 0) -- Assuming this method exists
