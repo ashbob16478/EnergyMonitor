@@ -209,10 +209,10 @@ function getVersion()
   local fileData
   if branch == "main" then
     writeFile("main.ver")
-    local fileData = fs.open("/EnergyMonitor/main.ver","r")
+    fileData = fs.open("/EnergyMonitor/main.ver","r")
   elseif branch == "development" then
     writeFile("development.ver")
-    local fileData = fs.open("/EnergyMonitor/development.ver","r")
+    fileData = fs.open("/EnergyMonitor/development.ver","r")
   end
 
   local list = fileData.readAll()
