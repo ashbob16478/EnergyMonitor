@@ -315,6 +315,7 @@ function initClasses()
 	-- Draconic Evolution Mod Support
 	shell.run(periPath.."draconicEvolution/DraconicCoreEnergyStorage.lua")
 	shell.run(periPath.."draconicEvolution/DraconicCoreEnergyTransfer.lua")
+	shell.run(periPath.."draconicEvolution/DraconicFluxGateEnergyTransfer.lua")
 end
 
 
