@@ -1,5 +1,5 @@
 {
-  version = "1.7.3.4-release",
+  version = "1.7.3.5-release",
   program = "n/a",
   language = "en",
   peripheralType = "n/a",

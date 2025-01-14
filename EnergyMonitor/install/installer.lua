@@ -398,7 +398,6 @@ updateOptionFileWithLanguage()
 
 --settings
 if not update then
-  updateOptionFile("version", version)
   updateOptionFile("program", programType)
   updateOptionFile("transferType", transferType)
   updateOptionFile("peripheralType", peripheralType)
