@@ -1,5 +1,5 @@
 -- EnergyTransfer Base Class
-local DraconicEnergyTransfer = setmetatable({
+local DraconicCoreEnergyTransfer = setmetatable({
     -- Basic Methods
     transferRateInput = function(self)
         if transferType == "input" or transferType == "both" then
@@ -18,10 +18,10 @@ local DraconicEnergyTransfer = setmetatable({
     end
 }, {__index = EnergyTransfer})
 
-function _G.newDraconicEnergyTransfer(name, id, side, type, transferType)
+function _G.newDraconicCoreEnergyTransfer(name, id, side, type, transferType)
     print("Creating new Draconic Energy Transfer")
     local transfer = {}
-    setmetatable(transfer, {__index=DraconicEnergyTransfer})
+    setmetatable(transfer, {__index=DraconicCoreEnergyTransfer})
     if id == nil then
         print("MISSING wrapped peripheral object. This is going to break!")
     end
