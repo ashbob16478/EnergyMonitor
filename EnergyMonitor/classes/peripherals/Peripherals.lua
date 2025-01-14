@@ -46,6 +46,8 @@ local function searchPeripherals()
 
         if _G.peripheralType == "capacitor" then
             local successGetEnergyStored, errGetEnergyStored = pcall(function() peri.getEnergyStored() end)
+
+            -- mekanism support
             local isMekanism = periType == "inductionMatrix" 
                 or periType == "mekanismMachine" 
                 or periType == "Induction Matrix" 
@@ -55,8 +57,10 @@ local function searchPeripherals()
                 or string.find(periType, "Energy Cube")
                 or string.find(periType, "EnergyCube")
 			
+            -- draconic evolution support
 			local isDraconicEvolution = periType == "draconic_rf_storage"
 
+            -- fallback to base
             local isBase = (not isMekanism and not isThermalExpansion and not isDraconicEvolution) and successGetEnergyStored
 
             if isBase then
@@ -81,6 +85,8 @@ local function searchPeripherals()
 
         if _G.peripheralType == "transfer" then
             local successGetEnergyTransferInput, errGetEnergyTransferInput = pcall(function() peri.getEnergyTransferInput() end)
+
+            -- mekanism support
             local isMekanism = periType == "inductionMatrix" 
                 or periType == "mekanismMachine" 
                 or periType == "Induction Matrix" 
@@ -90,10 +96,15 @@ local function searchPeripherals()
                 or string.find(periType, "Energy Cube")
                 or string.find(periType, "EnergyCube")
 			
+            -- energymeter support
             local isEnergyMeter = periType == "energymeter"
 
-			local isDraconicEvolution = periType == "draconic_rf_storage"
+            -- draconic evolution support
+			local isDraconicEvolutionEnergyCore = periType == "draconic_rf_storage"
+            local isDraconicEvolutionFluxGate = periType == "flow_gate"
+            local isDraconicEvolution = not isDraconicEvolutionEnergyCore and not isDraconicEvolutionFluxGate
 
+            -- fallback to base
             local isBase = (not isMekanism and not isThermalExpansion and not isDraconicEvolution) and successGetEnergyTransfer
 
             if isBase then
@@ -113,10 +124,16 @@ local function searchPeripherals()
                 _G.transferrer = newEnergyMeter("em0", peri, periItem, periType, _G.transferType)
             end
 			
-			if isDraconicEvolution then
+			if isDraconicEvolutionEnergyCore then
                 --Draconic energy core
-                print("DraconicEvolution Energy Storage device - "..peripheralList[i])
-                error("Draconic Transfer not yet supported")
+                print("DraconicEvolution EnergyCore Transfer device - "..peripheralList[i])
+                _G.transferrer = newDraconicCoreEnergyTransfer("ec0", peri, periItem, periType, _G.transferType)
+            end
+
+            if isDraconicEvolutionFluxGate then
+                --Draconic flux gate
+                print("DraconicEvolution Flux Gate Transfer device - "..peripheralList[i])
+                _G.transferrer = newDraconicFluxGateEnergyTransfer("ec0", peri, periItem, periType, _G.transferType)
             end
         end
             
