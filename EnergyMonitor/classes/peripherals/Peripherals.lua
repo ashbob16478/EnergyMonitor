@@ -98,7 +98,7 @@ local function searchPeripherals()
                 or string.find(periType, "EnergyCube")
 			
             -- energymeter support
-            local isEnergyMeter = periType == "energymeter"
+            local isEnergyMeter = (periType == "energymeter") or (periType == "energyDetector") or string.find(periType, "energy_detector")
 
             -- draconic evolution support
 			local isDraconicEvolutionEnergyCore = periType == "draconic_rf_storage"
